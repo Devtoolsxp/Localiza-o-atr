@@ -6,59 +6,74 @@
 <title>Painel Admin</title>
 
 <style>
+
+/* RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
 }
 
+/* BODY */
 body {
-    background: linear-gradient(135deg, #1e1e2f, #2c2c54);
-    color: #fff;
+    background: #0f172a;
+    color: #e2e8f0;
 }
 
 /* LOGIN */
 .login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .login-card {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(15px);
+    background: #1e293b;
     padding: 40px;
     border-radius: 16px;
     text-align: center;
     width: 320px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 .google-btn {
+    margin-top: 20px;
     width: 100%;
     padding: 12px;
-    border-radius: 10px;
     border: none;
-    cursor: pointer;
-    background: #fff;
-    color: #333;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
     font-weight: bold;
+    cursor: pointer;
     transition: 0.3s;
 }
 
 .google-btn:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
+}
+
+/* MAIN */
+.hidden {
+    display: none;
+}
+
+#mainPanel {
+    padding: 20px;
 }
 
 /* HEADER */
 .header {
     display: flex;
     justify-content: space-between;
-    padding: 15px 25px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
+    align-items: center;
+    background: #1e293b;
+    padding: 15px 20px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
 .user-info {
@@ -67,74 +82,99 @@ body {
     gap: 10px;
 }
 
+.credits {
+    background: #020617;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
+    border: 2px solid #3b82f6;
 }
 
 .logout-btn {
-    padding: 8px 12px;
-    background: red;
+    background: #ef4444;
     border: none;
+    padding: 8px 12px;
     border-radius: 8px;
-    color: #fff;
+    color: white;
+    cursor: pointer;
 }
 
-/* MAIN */
-#mainPanel {
-    padding: 20px;
-}
-
-/* CARD */
+/* CARDS */
 .card {
-    background: rgba(255,255,255,0.05);
+    background: #1e293b;
     padding: 20px;
     border-radius: 16px;
     margin-bottom: 20px;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
+.card h2 {
+    margin-bottom: 15px;
+}
+
+/* FORM */
 .form-row {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .form-group {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 200px;
+}
+
+.form-group label {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #94a3b8;
 }
 
 input, select, textarea {
     padding: 10px;
     border-radius: 8px;
     border: none;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+    background: #020617;
+    color: white;
+    outline: none;
 }
 
-/* BOTÕES */
+input:focus, select:focus, textarea:focus {
+    border: 1px solid #3b82f6;
+}
+
+/* BOTÃO */
 .generate-btn {
     width: 100%;
     padding: 14px;
-    border-radius: 10px;
     border: none;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#22c55e,#16a34a);
+    color: white;
+    font-weight: bold;
     cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
 }
 
-.copy-btn {
-    background: #00c853;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    color: #fff;
+.generate-btn:hover {
+    transform: scale(1.02);
 }
 
 /* URL */
+.generated-url {
+    margin-top: 15px;
+}
+
 .url-display {
     display: flex;
     gap: 10px;
@@ -144,21 +184,36 @@ input, select, textarea {
     flex: 1;
 }
 
+.copy-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: white;
+    cursor: pointer;
+}
+
 /* LISTAS */
 .urls-list, .captures-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    background: #020617;
+    padding: 15px;
+    border-radius: 10px;
+    min-height: 120px;
 }
 
 /* LOADING */
+.loading {
+    text-align: center;
+    color: #94a3b8;
+}
+
 .spinner {
     width: 30px;
     height: 30px;
-    border: 4px solid rgba(255,255,255,0.2);
-    border-top: 4px solid #fff;
+    border: 3px solid #1e293b;
+    border-top: 3px solid #3b82f6;
     border-radius: 50%;
-    margin: auto;
+    margin: 0 auto 10px;
     animation: spin 1s linear infinite;
 }
 
@@ -168,15 +223,18 @@ input, select, textarea {
 
 /* PREVIEW */
 .theme-preview {
-    margin-top: 10px;
-    padding: 20px;
+    margin-top: 15px;
+    padding: 15px;
     border-radius: 12px;
+    background: linear-gradient(135deg,#667eea,#764ba2);
     text-align: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    transition: 0.3s;
 }
 
-.hidden {
-    display: none;
+.theme-preview img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
 }
 
 /* RESPONSIVO */
@@ -184,7 +242,13 @@ input, select, textarea {
     .form-row {
         flex-direction: column;
     }
+
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
+
 </style>
 </head>
 
@@ -193,7 +257,7 @@ input, select, textarea {
 <!-- LOGIN -->
 <div id="loginScreen" class="login-container">
     <div class="login-card">
-        <h1>Painel Admin</h1>
+        <h1></h1>
         <p>Painel Administrativo</p>
         <button id="googleLoginBtn" class="google-btn">
             🔍 Entrar com Google
@@ -206,60 +270,119 @@ input, select, textarea {
 
     <div class="header">
         <h1>Painel Admin</h1>
+
         <div class="user-info">
-            <div id="creditsDisplay">Créditos: 0</div>
-            <img id="userAvatar" class="user-avatar">
+            <div class="credits" id="creditsDisplay">Créditos: 0</div>
+            <img id="userAvatar" class="user-avatar" src="">
             <span id="userName"></span>
             <button id="logoutBtn" class="logout-btn">Sair</button>
         </div>
     </div>
 
+    <!-- GERADOR -->
     <div id="generator" class="tab-content active">
         <div class="card">
-
             <h2>🔗 Gerar Nova URL</h2>
 
-            <div class="form-row">
+            <div class="url-generator">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome da Campanha:</label>
+                        <input type="text" id="campaignName">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Máximo de Usos:</label>
+                        <select id="maxUses"></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expirar em:</label>
+                        <select id="expirationTime"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status Inicial:</label>
+                        <select id="initialStatus"></select>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label>Nome da Campanha:</label>
-                    <input type="text" id="campaignName">
+                    <label>🎨 Personalização do Tema:</label>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título da Página:</label>
+                            <input type="text" id="themeTitle">
+                        </div>
+
+                        <div class="form-group">
+                            <label>URL da Imagem:</label>
+                            <input type="url" id="themeImageUrl">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição:</label>
+                        <textarea id="themeDescription"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cor do Tema:</label>
+                            <select id="themeColor"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Câmera:</label>
+                            <select id="themeEmoji"></select>
+                        </div>
+                    </div>
+
+                    <div class="theme-preview" id="themePreview">
+                        <div style="font-size:2em;" id="previewEmoji">🩴</div>
+                        <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
+                        <img id="previewImage" style="display:none;">
+                        <p id="previewDescription"></p>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Máximo de Usos:</label>
-                    <select id="maxUses">
-                        <option value="1">1</option>
-                        <option value="10">10</option>
-                    </select>
+
+                <button id="generateUrlBtn" class="generate-btn">
+                    Gerar URL (Custa 1 crédito)
+                </button>
+
+                <div id="generatedUrlSection" class="generated-url">
+                    <div class="url-display">
+                        <input id="generatedUrlInput" class="url-input" readonly>
+                        <button id="copyUrlBtn" class="copy-btn">Copiar</button>
+                    </div>
                 </div>
+
             </div>
-
-            <button id="generateUrlBtn" class="generate-btn">
-                Gerar URL
-            </button>
-
-            <div class="generated-url">
-                <div class="url-display">
-                    <input id="generatedUrlInput" class="url-input" readonly>
-                    <button id="copyUrlBtn" class="copy-btn">Copiar</button>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- URLS -->
+    <!-- LISTAS -->
     <div class="card">
         <h2>📋 URLs Geradas</h2>
         <div id="urlsList" class="urls-list">
-            <div class="spinner"></div>
+            <div class="loading">
+                <div class="spinner"></div>
+                Carregando URLs...
+            </div>
         </div>
     </div>
 
-    <!-- CAPTURAS -->
     <div class="card">
-        <h2>📹 Capturas</h2>
+        <h2>📹 Capturas Realizadas</h2>
         <div id="capturesList" class="captures-list">
-            <div class="spinner"></div>
+            <div class="loading">
+                <div class="spinner"></div>
+                Carregando capturas...
+            </div>
         </div>
     </div>
 
