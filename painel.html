@@ -4,900 +4,671 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin</title>
-    <link rel="stylesheet" href="app/admin.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap');
 
         :root {
-            --bg-base: #0a0b0f;
-            --bg-surface: #111318;
-            --bg-card: #161820;
-            --bg-hover: #1e2028;
-            --border: rgba(255,255,255,0.07);
+            --bg-base:       #0a0b0f;
+            --bg-surface:    #111318;
+            --bg-card:       #161820;
+            --bg-hover:      #1e2028;
+            --border:        rgba(255,255,255,0.07);
             --border-active: rgba(99,102,241,0.5);
-            --accent: #6366f1;
-            --accent-glow: rgba(99,102,241,0.2);
-            --accent-2: #22d3ee;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text-primary: #e8eaf0;
-            --text-secondary: #7c7f8e;
-            --text-muted: #4a4d5e;
-            --sidebar-w: 240px;
-            --sidebar-collapsed: 68px;
-            --header-h: 60px;
-            --radius: 12px;
-            --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --accent:        #6366f1;
+            --accent-glow:   rgba(99,102,241,0.18);
+            --accent2:       #22d3ee;
+            --success:       #10b981;
+            --danger:        #ef4444;
+            --warning:       #f59e0b;
+            --txt1:          #e8eaf0;
+            --txt2:          #7c7f8e;
+            --txt3:          #4a4d5e;
+            --sw:            240px;
+            --sw-sm:         64px;
+            --hh:            60px;
+            --r:             12px;
+            --ease:          0.22s cubic-bezier(.4,0,.2,1);
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        body {
-            font-family: 'Syne', sans-serif;
+        html, body {
+            width: 100%; height: 100%;
+            font-family: 'Syne', Arial, sans-serif;
             background: var(--bg-base);
-            color: var(--text-primary);
-            min-height: 100vh;
+            color: var(--txt1);
+            overflow: hidden;
         }
 
-        /* ── LOGIN ─────────────────────────────────────── */
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+        /* ════════════════════════════════
+           LOGIN
+        ════════════════════════════════ */
+        #loginScreen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
             background: var(--bg-base);
-            position: relative;
         }
-
-        .login-container::before {
+        #loginScreen::before {
             content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 50% at 50% 0%,
+                rgba(99,102,241,.18) 0%, transparent 70%);
             pointer-events: none;
         }
-
         .login-card {
+            position: relative;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 52px 44px;
             text-align: center;
-            max-width: 380px;
-            width: 100%;
-            box-shadow: 0 0 80px rgba(99,102,241,0.08);
-            position: relative;
+            width: 100%; max-width: 380px;
+            box-shadow: 0 0 80px rgba(99,102,241,.08);
         }
-
-        .login-card h1 { font-size: 2em; margin-bottom: 6px; color: var(--text-primary); }
-        .login-card p { color: var(--text-secondary); margin-bottom: 36px; font-size: 0.95em; letter-spacing: 0.02em; }
-
+        .login-card h1 { font-size: 2.2em; margin-bottom: 8px; }
+        .login-card p  { color: var(--txt2); margin-bottom: 36px; font-size: .95em; }
         .google-btn {
-            background: linear-gradient(135deg, #4285f4, #1a6ff5);
-            border: none;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 700;
-            font-family: 'Syne', sans-serif;
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             width: 100%;
-            box-shadow: 0 4px 20px rgba(66,133,244,0.3);
-            letter-spacing: 0.02em;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: linear-gradient(135deg,#4285f4,#1a6ff5);
+            border: none; border-radius: 50px;
+            color: #fff; font-family: inherit; font-size: 1em; font-weight: 700;
+            padding: 14px 28px; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(66,133,244,.3);
+            transition: transform var(--ease), box-shadow var(--ease);
         }
-
         .google-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(66,133,244,0.45);
+            box-shadow: 0 8px 28px rgba(66,133,244,.45);
         }
 
-        /* ── LAYOUT SHELL ──────────────────────────────── */
+        /* ════════════════════════════════
+           SHELL
+        ════════════════════════════════ */
         #mainPanel {
-            display: flex;
-            height: 100vh;
+            position: fixed; inset: 0;
+            display: flex; flex-direction: row;
             overflow: hidden;
-            width: 100vw;
-            position: fixed;
-            top: 0; left: 0;
         }
 
-        /* ── SIDEBAR ───────────────────────────────────── */
-        .sidebar {
-            width: var(--sidebar-w);
-            min-width: var(--sidebar-w);
+        /* ════════════════════════════════
+           SIDEBAR
+        ════════════════════════════════ */
+        #sidebar {
+            width: var(--sw);
+            flex: 0 0 var(--sw);
+            display: flex; flex-direction: column;
             background: var(--bg-surface);
             border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            transition: width var(--transition), min-width var(--transition);
             overflow: hidden;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 100;
+            transition: width var(--ease), flex-basis var(--ease);
+            z-index: 10;
+        }
+        #sidebar.collapsed {
+            width: var(--sw-sm);
+            flex-basis: var(--sw-sm);
         }
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed);
-            min-width: var(--sidebar-collapsed);
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            height: var(--header-h);
+        .sb-header {
+            display: flex; align-items: center; justify-content: space-between;
+            height: var(--hh); padding: 0 14px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
-
-        .sidebar-logo {
-            font-size: 1.1em;
-            font-weight: 800;
-            color: var(--accent);
+        .sb-logo {
+            font-size: 1.1em; font-weight: 800; color: var(--accent);
             white-space: nowrap;
+            opacity: 1; max-width: 160px;
+            transition: opacity var(--ease), max-width var(--ease);
             overflow: hidden;
-            opacity: 1;
-            transition: opacity var(--transition);
         }
+        #sidebar.collapsed .sb-logo { opacity: 0; max-width: 0; }
 
-        .sidebar.collapsed .sidebar-logo { opacity: 0; width: 0; }
-
-        .collapse-btn {
+        .sb-toggle {
+            flex-shrink: 0;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
             background: var(--bg-hover);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
-            width: 32px; height: 32px;
-            border-radius: 8px;
+            border-radius: 7px;
+            color: var(--txt2);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all var(--transition);
-            font-size: 1em;
+            font-size: 1.1em; line-height: 1;
+            transition: background var(--ease), color var(--ease);
         }
+        .sb-toggle:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-        .collapse-btn:hover {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        /* Nav items */
-        .sidebar-nav {
+        .sb-nav {
             flex: 1;
-            padding: 16px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            padding: 14px 8px;
+            display: flex; flex-direction: column; gap: 3px;
             overflow: hidden;
         }
-
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 11px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all var(--transition);
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 11px;
+            padding: 10px 11px;
+            border-radius: 9px;
             border: 1px solid transparent;
-            font-size: 0.92em;
-            font-weight: 600;
-            letter-spacing: 0.01em;
+            color: var(--txt2);
+            cursor: pointer;
+            font-size: .9em; font-weight: 600;
+            white-space: nowrap;
             text-decoration: none;
+            transition: background var(--ease), color var(--ease), border-color var(--ease);
         }
+        .nav-item:hover  { background: var(--bg-hover); color: var(--txt1); }
+        .nav-item.active { background: var(--accent-glow); color: var(--accent); border-color: var(--border-active); }
+        .nav-icon  { font-size: 1.15em; flex-shrink: 0; width: 22px; text-align: center; }
+        .nav-label { overflow: hidden; opacity: 1; transition: opacity var(--ease); }
+        #sidebar.collapsed .nav-label { opacity: 0; width: 0; }
 
-        .nav-item:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: var(--accent-glow);
-            color: var(--accent);
-            border-color: var(--border-active);
-        }
-
-        .nav-icon {
-            font-size: 1.2em;
-            flex-shrink: 0;
-            width: 24px;
-            text-align: center;
-        }
-
-        .nav-label {
-            opacity: 1;
-            transition: opacity var(--transition);
-            overflow: hidden;
-        }
-
-        .sidebar.collapsed .nav-label { opacity: 0; width: 0; }
-
-        /* Sidebar footer – user info */
-        .sidebar-footer {
+        .sb-footer {
             border-top: 1px solid var(--border);
-            padding: 14px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-            overflow: hidden;
+            padding: 12px 10px;
+            display: flex; align-items: center; gap: 10px;
+            flex-shrink: 0; overflow: hidden;
         }
-
-        .user-avatar {
-            width: 36px; height: 36px;
+        #userAvatar {
+            width: 34px; height: 34px;
             border-radius: 50%;
             border: 2px solid var(--border-active);
-            flex-shrink: 0;
-            object-fit: cover;
+            flex-shrink: 0; object-fit: cover;
         }
-
-        .sidebar-user-info {
-            overflow: hidden;
-            opacity: 1;
-            transition: opacity var(--transition);
-            flex: 1;
+        .sb-user { overflow: hidden; opacity: 1; transition: opacity var(--ease); flex: 1; }
+        #sidebar.collapsed .sb-user { opacity: 0; width: 0; }
+        #userName {
+            font-size: .83em; font-weight: 700; color: var(--txt1);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
-
-        .sidebar-username {
-            font-size: 0.85em;
-            font-weight: 700;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-credits {
-            font-size: 0.75em;
-            color: var(--accent-2);
+        #creditsDisplay {
+            font-size: .73em; font-weight: 600;
+            color: var(--accent2);
             font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
         }
 
-        /* ── MAIN AREA ─────────────────────────────────── */
-        .main-area {
-            flex: 1;
+        /* ════════════════════════════════
+           MAIN AREA
+        ════════════════════════════════ */
+        #mainArea {
+            flex: 1 1 0;
             min-width: 0;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             overflow: hidden;
         }
 
-        /* Top header bar */
-        .topbar {
-            height: var(--header-h);
+        #topbar {
+            height: var(--hh); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 22px;
             background: var(--bg-surface);
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            flex-shrink: 0;
         }
-
-        .topbar-title {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .credits-badge {
+        #topbarTitle { font-size: 1.05em; font-weight: 700; }
+        .tb-right { display: flex; align-items: center; gap: 12px; }
+        #creditsTop {
             background: var(--bg-card);
             border: 1px solid var(--border-active);
-            color: var(--accent-2);
-            padding: 6px 14px;
-            border-radius: 20px;
+            color: var(--accent2);
+            padding: 5px 13px; border-radius: 20px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82em;
-            font-weight: 700;
+            font-size: .8em; font-weight: 700;
         }
-
-        .logout-btn {
-            background: rgba(239,68,68,0.12);
-            border: 1px solid rgba(239,68,68,0.3);
+        #logoutBtn {
+            background: rgba(239,68,68,.12);
+            border: 1px solid rgba(239,68,68,.3);
             color: var(--danger);
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 7px 15px; border-radius: 8px;
+            font-family: inherit; font-size: .84em; font-weight: 700;
             cursor: pointer;
-            font-family: 'Syne', sans-serif;
-            font-size: 0.85em;
-            font-weight: 700;
-            transition: all var(--transition);
+            transition: background var(--ease), color var(--ease);
         }
+        #logoutBtn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
-        .logout-btn:hover {
-            background: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        /* ── CONTENT AREA ──────────────────────────────── */
-        .content-area {
-            flex: 1;
+        #contentArea {
+            flex: 1 1 0;
             overflow-y: auto;
-            padding: 24px;
+            padding: 22px;
             scrollbar-width: thin;
             scrollbar-color: var(--bg-hover) transparent;
         }
+        #contentArea::-webkit-scrollbar       { width: 5px; }
+        #contentArea::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
 
-        .content-area::-webkit-scrollbar { width: 5px; }
-        .content-area::-webkit-scrollbar-track { background: transparent; }
-        .content-area::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
-
-        /* ── TAB PANELS ────────────────────────────────── */
-        .tab-content { display: none; animation: fadeIn 0.2s ease; }
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity:0; transform: translateY(6px); }
-            to { opacity:1; transform: translateY(0); }
+        /* ════════════════════════════════
+           ABAS
+        ════════════════════════════════ */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadein .18s ease; }
+        @keyframes fadein {
+            from { opacity:0; transform: translateY(5px); }
+            to   { opacity:1; transform: translateY(0); }
         }
 
-        /* ── CARDS ─────────────────────────────────────── */
+        /* ════════════════════════════════
+           CARDS
+        ════════════════════════════════ */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
+            border-radius: var(--r);
+            padding: 22px;
+            margin-bottom: 18px;
         }
-
         .card h2 {
-            color: var(--text-primary);
-            font-size: 1.15em;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: 0.01em;
+            font-size: 1.1em; font-weight: 700;
+            color: var(--txt1);
+            margin-bottom: 18px;
+            display: flex; align-items: center; gap: 9px;
         }
 
-        /* ── FORM ──────────────────────────────────────── */
-        .url-generator { display: grid; gap: 18px; }
+        /* ════════════════════════════════
+           FORMULÁRIO
+        ════════════════════════════════ */
+        .url-generator { display: grid; gap: 16px; }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .form-group { display: grid; gap: 8px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+        .form-group { display: grid; gap: 7px; }
         .form-group.full-width { grid-column: 1 / -1; }
 
         .form-group label {
-            color: var(--text-secondary);
-            font-size: 0.82em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            color: var(--txt2);
+            font-size: .78em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .07em;
         }
-
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 11px 14px;
+            padding: 10px 13px;
             border: 1px solid var(--border);
             border-radius: 8px;
             background: var(--bg-surface);
-            color: var(--text-primary);
-            font-size: 0.92em;
-            font-family: 'Syne', sans-serif;
-            transition: border-color var(--transition);
+            color: var(--txt1);
+            font-family: inherit; font-size: .9em;
             outline: none;
+            transition: border-color var(--ease), box-shadow var(--ease);
         }
-
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-glow);
         }
-
         .form-group select option { background: var(--bg-card); }
-        .form-group textarea { resize: vertical; min-height: 60px; }
-
+        .form-group textarea { resize: vertical; min-height: 58px; }
         .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: var(--text-muted);
-        }
+        .form-group textarea::placeholder { color: var(--txt3); }
 
-        /* Theme preview */
         .theme-preview {
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-            margin-top: 8px;
-            text-align: center;
-            color: var(--text-primary);
+            border-radius: 9px;
+            padding: 14px; margin-top: 8px;
+            text-align: center; color: var(--txt1);
         }
+        .theme-preview img { max-width:80px; max-height:80px; border-radius:8px; margin-bottom:7px; }
+        .theme-preview h3  { font-size:.95em; margin-bottom:5px; }
+        .theme-preview p   { font-size:.83em; color:var(--txt2); }
 
-        .theme-preview img {
-            max-width: 80px; max-height: 80px;
-            border-radius: 8px; margin-bottom: 8px;
-        }
-
-        .theme-preview h3 { font-size: 1em; margin-bottom: 6px; }
-        .theme-preview p { font-size: 0.85em; color: var(--text-secondary); }
-
-        /* Buttons */
         .generate-btn {
-            background: linear-gradient(135deg, var(--accent), #818cf8);
-            border: none;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 700;
-            font-family: 'Syne', sans-serif;
-            transition: all var(--transition);
+            background: linear-gradient(135deg,var(--accent),#818cf8);
+            border: none; border-radius: 10px;
+            color: #fff; font-family: inherit; font-size:.93em; font-weight:700;
+            padding: 13px 26px; cursor: pointer;
             box-shadow: 0 4px 20px var(--accent-glow);
-            letter-spacing: 0.02em;
+            letter-spacing: .02em;
+            transition: transform var(--ease), box-shadow var(--ease);
         }
-
         .generate-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(99,102,241,0.4);
+            box-shadow: 0 8px 28px rgba(99,102,241,.4);
         }
-
         .generate-btn:disabled {
-            background: var(--bg-hover);
-            color: var(--text-muted);
-            cursor: not-allowed;
-            box-shadow: none;
+            background: var(--bg-hover); color: var(--txt3);
+            cursor: not-allowed; box-shadow: none;
         }
 
-        /* Generated URL */
         .generated-url {
             background: var(--bg-surface);
             border: 1px solid var(--border-active);
             border-radius: 10px;
-            padding: 16px;
-            margin-top: 16px;
+            padding: 14px; margin-top: 14px;
             display: none;
         }
-
-        .url-display {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
+        .url-display { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
         .url-input {
-            flex: 1;
+            flex:1;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            color: var(--accent-2);
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82em;
+            color: var(--accent2);
+            padding: 9px 11px; border-radius:8px;
+            font-family:'JetBrains Mono',monospace; font-size:.8em;
             outline: none;
         }
-
         .copy-btn {
-            background: var(--accent);
-            border: none;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 0.85em;
-            transition: all var(--transition);
+            background: var(--accent); border:none; border-radius:8px;
+            color:#fff; font-family:inherit; font-size:.83em; font-weight:700;
+            padding:9px 15px; cursor:pointer;
+            transition: background var(--ease);
         }
-
         .copy-btn:hover { background: #818cf8; }
 
-        /* Lists */
-        .urls-list { max-height: 420px; overflow-y: auto; display: grid; gap: 10px; }
-        .captures-list { max-height: 700px; overflow-y: auto; display: grid; gap: 12px; }
+        .urls-list     { max-height:420px; overflow-y:auto; display:grid; gap:9px; }
+        .captures-list { max-height:700px; overflow-y:auto; display:grid; gap:11px; }
 
         .url-item, .capture-item {
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 16px;
-            color: var(--text-primary);
-            transition: border-color var(--transition);
+            padding: 15px; color: var(--txt1);
+            transition: border-color var(--ease);
         }
-
-        .url-item:hover, .capture-item:hover {
-            border-color: rgba(99,102,241,0.3);
-        }
+        .url-item:hover, .capture-item:hover { border-color: rgba(99,102,241,.3); }
 
         .url-header, .capture-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:9px;
         }
-
-        .url-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
+        .url-controls { display:flex; gap:8px; margin-top:11px; }
 
         .toggle-btn {
-            border: none;
-            color: white;
-            padding: 7px 14px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 0.82em;
-            transition: all var(--transition);
+            border:none; border-radius:7px;
+            color:#fff; font-family:inherit; font-size:.8em; font-weight:700;
+            padding:6px 13px; cursor:pointer;
+            transition: filter var(--ease), transform var(--ease);
         }
-
-        .toggle-btn.active { background: var(--success); }
-        .toggle-btn.inactive { background: var(--danger); }
-        .toggle-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+        .toggle-btn.active   { background:var(--success); }
+        .toggle-btn.inactive { background:var(--danger); }
+        .toggle-btn:hover    { filter:brightness(1.15); transform:translateY(-1px); }
 
         .url-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.78em;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.05em;
+            padding:3px 11px; border-radius:20px;
+            font-size:.75em; font-weight:700;
+            font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
         }
-
-        .status-active { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
-        .status-expired { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.25); }
-        .status-limited { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.25); }
-        .status-inactive { background: rgba(124,127,142,0.12); color: var(--text-secondary); border: 1px solid rgba(124,127,142,0.25); }
+        .status-active   { background:rgba(16,185,129,.14);  color:var(--success); border:1px solid rgba(16,185,129,.3); }
+        .status-expired  { background:rgba(239,68,68,.12);   color:var(--danger);  border:1px solid rgba(239,68,68,.25); }
+        .status-limited  { background:rgba(245,158,11,.12);  color:var(--warning); border:1px solid rgba(245,158,11,.25); }
+        .status-inactive { background:rgba(124,127,142,.12); color:var(--txt2);    border:1px solid rgba(124,127,142,.25); }
 
         .theme-info {
-            background: var(--bg-card);
-            padding: 10px 12px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.85em;
-            color: var(--text-secondary);
+            background:var(--bg-card); padding:9px 11px; border-radius:8px;
+            margin-top:9px; font-size:.83em; color:var(--txt2);
         }
 
-        .capture-date { font-weight: 700; color: var(--accent-2); font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
-
+        .capture-date { font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:.83em; }
         .capture-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:11px; margin-bottom:11px;
         }
-
         .detail-group h4 {
-            color: var(--warning);
-            margin-bottom: 4px;
-            font-size: 0.78em;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
+            color:var(--warning); margin-bottom:3px;
+            font-size:.75em; text-transform:uppercase; letter-spacing:.06em;
         }
+        .detail-group p { font-size:.83em; line-height:1.5; color:var(--txt2); }
+        .video-player { width:100%; max-width:400px; border-radius:10px; margin-top:9px; }
 
-        .detail-group p { font-size: 0.85em; line-height: 1.5; color: var(--text-secondary); }
-
-        .video-player {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        /* Loading */
         .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            padding: 40px;
+            display:flex; align-items:center; justify-content:center;
+            gap:10px; color:var(--txt2); font-size:.88em; padding:40px;
         }
-
         .spinner {
-            width: 18px; height: 18px;
-            border: 2px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            width:17px; height:17px;
+            border:2px solid var(--border);
+            border-top-color:var(--accent);
+            border-radius:50%;
+            animation:spin .8s linear infinite;
         }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display:none !important; }
 
-        .hidden { display: none !important; }
-
-        /* ── RESPONSIVE ─────────────────────────────────── */
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 200; }
-            .sidebar:not(.collapsed) { box-shadow: 20px 0 60px rgba(0,0,0,0.5); }
-
-            .form-row { grid-template-columns: 1fr; }
-            .capture-details { grid-template-columns: 1fr; }
-            .url-controls { flex-direction: column; }
+        @media (max-width:768px) {
+            .form-row        { grid-template-columns:1fr; }
+            .capture-details { grid-template-columns:1fr; }
+            .url-controls    { flex-direction:column; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ── TELA DE LOGIN ─────────────────────────────── -->
-    <div id="loginScreen" class="login-container">
-        <div class="login-card">
-            <h1>⚡</h1>
-            <p>Painel Administrativo</p>
-            <button id="googleLoginBtn" class="google-btn">
-                <span>🔍</span>
-                Entrar com Google
-            </button>
-        </div>
+<!-- TELA DE LOGIN -->
+<div id="loginScreen">
+    <div class="login-card">
+        <h1>⚡</h1>
+        <p>Painel Administrativo</p>
+        <button id="googleLoginBtn" class="google-btn">
+            <span>🔍</span> Entrar com Google
+        </button>
     </div>
+</div>
 
-    <!-- ── PAINEL PRINCIPAL ──────────────────────────── -->
-    <div id="mainPanel" class="hidden">
+<!-- PAINEL PRINCIPAL -->
+<div id="mainPanel" class="hidden">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <span class="sidebar-logo">⚡ Admin</span>
-                <button class="collapse-btn" id="collapseBtn" title="Recolher menu">‹</button>
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <div class="sb-header">
+            <span class="sb-logo">⚡ Admin</span>
+            <button class="sb-toggle" id="collapseBtn">‹</button>
+        </div>
+
+        <nav class="sb-nav">
+            <a class="nav-item active" onclick="switchTab('generator',this)">
+                <span class="nav-icon">🔗</span>
+                <span class="nav-label">Gerar URL</span>
+            </a>
+            <a class="nav-item" onclick="switchTab('urlsList-tab',this)">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">URLs Geradas</span>
+            </a>
+            <a class="nav-item" onclick="switchTab('captures-tab',this)">
+                <span class="nav-icon">📹</span>
+                <span class="nav-label">Capturas</span>
+            </a>
+        </nav>
+
+        <div class="sb-footer">
+            <img id="userAvatar" src="" alt="Avatar">
+            <div class="sb-user">
+                <div id="userName">Usuário</div>
+                <div id="creditsDisplay">0 créditos</div>
             </div>
+        </div>
+    </aside>
 
-            <nav class="sidebar-nav">
-                <a class="nav-item active" data-tab="generator" onclick="switchTab('generator', this)">
-                    <span class="nav-icon">🔗</span>
-                    <span class="nav-label">Gerar URL</span>
-                </a>
-                <a class="nav-item" data-tab="urlsList-tab" onclick="switchTab('urlsList-tab', this)">
-                    <span class="nav-icon">📋</span>
-                    <span class="nav-label">URLs Geradas</span>
-                </a>
-                <a class="nav-item" data-tab="captures-tab" onclick="switchTab('captures-tab', this)">
-                    <span class="nav-icon">📹</span>
-                    <span class="nav-label">Capturas</span>
-                </a>
-            </nav>
+    <!-- ÁREA PRINCIPAL -->
+    <div id="mainArea">
 
-            <div class="sidebar-footer">
-                <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
-                <div class="sidebar-user-info">
-                    <div class="sidebar-username" id="userName">Usuário</div>
-                    <div class="sidebar-credits" id="creditsDisplay">0 créditos</div>
-                </div>
+        <div id="topbar">
+            <span id="topbarTitle">🔗 Gerar URL</span>
+            <div class="tb-right">
+                <div id="creditsTop">Créditos: 0</div>
+                <button id="logoutBtn">Sair</button>
             </div>
-        </aside>
+        </div>
 
-        <!-- MAIN -->
-        <div class="main-area">
-            <header class="topbar">
-                <span class="topbar-title" id="topbarTitle">🔗 Gerar URL</span>
-                <div class="topbar-actions">
-                    <div class="credits-badge" id="creditsTop">Créditos: 0</div>
-                    <button id="logoutBtn" class="logout-btn">Sair</button>
-                </div>
-            </header>
+        <div id="contentArea">
 
-            <div class="content-area">
+            <!-- ABA: Gerar URL -->
+            <div id="generator" class="tab-content active">
+                <div class="card">
+                    <h2>🔗 Gerar Nova URL</h2>
+                    <div class="url-generator">
 
-                <!-- ABA: Gerador de URL -->
-                <div id="generator" class="tab-content active">
-                    <div class="card">
-                        <h2>🔗 Gerar Nova URL</h2>
-                        <div class="url-generator">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome da Campanha</label>
+                                <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
+                            </div>
+                            <div class="form-group">
+                                <label>Máximo de Usos</label>
+                                <select id="maxUses">
+                                    <option value="1">1 uso</option>
+                                    <option value="5">5 usos</option>
+                                    <option value="10" selected>10 usos</option>
+                                    <option value="50">50 usos</option>
+                                    <option value="100">100 usos</option>
+                                    <option value="-1">Ilimitado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expirar em</label>
+                                <select id="expirationTime">
+                                    <option value="1">1 dia</option>
+                                    <option value="7" selected>7 dias</option>
+                                    <option value="30">30 dias</option>
+                                    <option value="90">90 dias</option>
+                                    <option value="-1">Nunca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Status Inicial</label>
+                                <select id="initialStatus">
+                                    <option value="active" selected>Ativa</option>
+                                    <option value="inactive">Inativa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>🎨 Personalização do Tema</label>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Nome da Campanha</label>
-                                    <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
+                                    <label>Título da Página</label>
+                                    <input type="text" id="themeTitle" placeholder="Ex: Promoção Especial!" value="🩴 Sandálias Retrô">
                                 </div>
                                 <div class="form-group">
-                                    <label>Máximo de Usos</label>
-                                    <select id="maxUses">
-                                        <option value="1">1 uso</option>
-                                        <option value="5">5 usos</option>
-                                        <option value="10" selected>10 usos</option>
-                                        <option value="50">50 usos</option>
-                                        <option value="100">100 usos</option>
-                                        <option value="-1">Ilimitado</option>
-                                    </select>
+                                    <label>URL da Imagem</label>
+                                    <input type="url" id="themeImageUrl" placeholder="https://exemplo.com/imagem.jpg">
                                 </div>
                             </div>
-
+                            <div class="form-group">
+                                <label>Descrição / Texto</label>
+                                <textarea id="themeDescription" placeholder="Digite uma descrição...">Participe da nossa promoção exclusiva!</textarea>
+                            </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Expirar em</label>
-                                    <select id="expirationTime">
-                                        <option value="1">1 dia</option>
-                                        <option value="7" selected>7 dias</option>
-                                        <option value="30">30 dias</option>
-                                        <option value="90">90 dias</option>
-                                        <option value="-1">Nunca</option>
+                                    <label>Cor do Tema</label>
+                                    <select id="themeColor">
+                                        <option value="#667eea,#764ba2" selected>Roxo/Azul (Padrão)</option>
+                                        <option value="#ff6b6b,#ee5a6f">Vermelho/Rosa</option>
+                                        <option value="#4ecdc4,#44a08d">Verde/Turquesa</option>
+                                        <option value="#ffa726,#fb8c00">Laranja</option>
+                                        <option value="#42a5f5,#1e88e5">Azul</option>
+                                        <option value="#ab47bc,#8e24aa">Roxo</option>
+                                        <option value="#26c6da,#00acc1">Ciano</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Status Inicial</label>
-                                    <select id="initialStatus">
-                                        <option value="active" selected>Ativa</option>
-                                        <option value="inactive">Inativa</option>
+                                    <label>Câmera</label>
+                                    <select id="themeEmoji">
+                                        <option value="1">Traseira</option>
+                                        <option value="5">Frontal</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <!-- Personalização de Tema -->
-                            <div class="form-group full-width">
-                                <label>🎨 Personalização do Tema</label>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Título da Página</label>
-                                        <input type="text" id="themeTitle" placeholder="Ex: Promoção Especial!" value="🩴 Sandálias Retrô">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>URL da Imagem</label>
-                                        <input type="url" id="themeImageUrl" placeholder="https://exemplo.com/imagem.jpg">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Descrição / Texto</label>
-                                    <textarea id="themeDescription" placeholder="Digite uma descrição ou mensagem personalizada...">Participe da nossa promoção exclusiva!</textarea>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Cor do Tema</label>
-                                        <select id="themeColor">
-                                            <option value="#667eea,#764ba2" selected>Roxo/Azul (Padrão)</option>
-                                            <option value="#ff6b6b,#ee5a6f">Vermelho/Rosa</option>
-                                            <option value="#4ecdc4,#44a08d">Verde/Turquesa</option>
-                                            <option value="#ffa726,#fb8c00">Laranja</option>
-                                            <option value="#42a5f5,#1e88e5">Azul</option>
-                                            <option value="#ab47bc,#8e24aa">Roxo</option>
-                                            <option value="#26c6da,#00acc1">Ciano</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Câmera</label>
-                                        <select id="themeEmoji">
-                                            <option value="1">Traseira</option>
-                                            <option value="5">Frontal</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="theme-preview" id="themePreview">
-                                    <div style="font-size: 2em;" id="previewEmoji">🩴</div>
-                                    <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
-                                    <img id="previewImage" style="display:none;" alt="Preview">
-                                    <p id="previewDescription">Participe da nossa promoção exclusiva!</p>
-                                </div>
+                            <div class="theme-preview" id="themePreview">
+                                <div style="font-size:2em" id="previewEmoji">🩴</div>
+                                <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
+                                <img id="previewImage" style="display:none" alt="Preview">
+                                <p id="previewDescription">Participe da nossa promoção exclusiva!</p>
                             </div>
+                        </div>
 
-                            <button id="generateUrlBtn" class="generate-btn">
-                                ✦ Gerar URL &nbsp;(Custa 1 crédito)
-                            </button>
+                        <button id="generateUrlBtn" class="generate-btn">
+                            ✦ Gerar URL &nbsp;(Custa 1 crédito)
+                        </button>
 
-                            <div id="generatedUrlSection" class="generated-url">
-                                <div class="url-display">
-                                    <input type="text" id="generatedUrlInput" class="url-input" readonly>
-                                    <button id="copyUrlBtn" class="copy-btn">Copiar</button>
-                                </div>
-                                <p style="color: var(--text-muted); font-size: 0.82em;">
-                                    Compartilhe esta URL para capturar dados dos usuários
-                                </p>
+                        <div id="generatedUrlSection" class="generated-url">
+                            <div class="url-display">
+                                <input type="text" id="generatedUrlInput" class="url-input" readonly>
+                                <button id="copyUrlBtn" class="copy-btn">Copiar</button>
                             </div>
+                            <p style="color:var(--txt3);font-size:.8em">
+                                Compartilhe esta URL para capturar dados dos usuários
+                            </p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- ABA: URLs Geradas -->
-                <div id="urlsList-tab" class="tab-content">
-                    <div class="card">
-                        <h2>📋 URLs Geradas</h2>
-                        <div id="urlsList" class="urls-list">
-                            <div class="loading">
-                                <div class="spinner"></div>
-                                Carregando URLs...
-                            </div>
-                        </div>
+            <!-- ABA: URLs Geradas -->
+            <div id="urlsList-tab" class="tab-content">
+                <div class="card">
+                    <h2>📋 URLs Geradas</h2>
+                    <div id="urlsList" class="urls-list">
+                        <div class="loading"><div class="spinner"></div>Carregando URLs...</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- ABA: Capturas -->
-                <div id="captures-tab" class="tab-content">
-                    <div class="card">
-                        <h2>📹 Capturas Realizadas</h2>
-                        <div id="capturesList" class="captures-list">
-                            <div class="loading">
-                                <div class="spinner"></div>
-                                Carregando capturas...
-                            </div>
-                        </div>
+            <!-- ABA: Capturas -->
+            <div id="captures-tab" class="tab-content">
+                <div class="card">
+                    <h2>📹 Capturas Realizadas</h2>
+                    <div id="capturesList" class="captures-list">
+                        <div class="loading"><div class="spinner"></div>Carregando capturas...</div>
                     </div>
                 </div>
+            </div>
 
-            </div><!-- /content-area -->
-        </div><!-- /main-area -->
-    </div><!-- /mainPanel -->
+        </div><!-- /contentArea -->
+    </div><!-- /mainArea -->
+</div><!-- /mainPanel -->
 
-    <!-- Firebase SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+<!-- Firebase SDK -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
 
-    <script>
-        /* ── SIDEBAR COLLAPSE ──────────────────────────── */
-        const sidebar = document.getElementById('sidebar');
-        const collapseBtn = document.getElementById('collapseBtn');
-        let collapsed = false;
+<script>
+    /* SIDEBAR */
+    const sidebar     = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('collapseBtn');
+    let collapsed = false;
 
-        collapseBtn.addEventListener('click', () => {
-            collapsed = !collapsed;
-            sidebar.classList.toggle('collapsed', collapsed);
-            collapseBtn.textContent = collapsed ? '›' : '‹';
-        });
+    function setCollapsed(val) {
+        collapsed = val;
+        sidebar.classList.toggle('collapsed', collapsed);
+        collapseBtn.textContent = collapsed ? '›' : '‹';
+    }
 
-        /* Auto-collapse on narrow screens */
-        function checkWidth() {
-            if (window.innerWidth < 900 && !collapsed) {
-                collapsed = true;
-                sidebar.classList.add('collapsed');
-                collapseBtn.textContent = '›';
-            }
-        }
-        checkWidth();
-        window.addEventListener('resize', checkWidth);
+    collapseBtn.addEventListener('click', () => setCollapsed(!collapsed));
 
-        /* ── TAB SWITCHING ─────────────────────────────── */
-        const tabTitles = {
-            'generator': '🔗 Gerar URL',
-            'urlsList-tab': '📋 URLs Geradas',
-            'captures-tab': '📹 Capturas',
-        };
+    function checkWidth() {
+        if (window.innerWidth < 900) setCollapsed(true);
+    }
+    checkWidth();
+    window.addEventListener('resize', checkWidth);
 
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            if (el) el.classList.add('active');
-            document.getElementById('topbarTitle').textContent = tabTitles[tabId] || '';
+    /* ABAS */
+    const tabTitles = {
+        'generator':    '🔗 Gerar URL',
+        'urlsList-tab': '📋 URLs Geradas',
+        'captures-tab': '📹 Capturas',
+    };
 
-            /* Auto-collapse sidebar on mobile after tab click */
-            if (window.innerWidth < 768 && !collapsed) {
-                collapsed = true;
-                sidebar.classList.add('collapsed');
-                collapseBtn.textContent = '›';
-            }
-        }
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        if (el) el.classList.add('active');
+        document.getElementById('topbarTitle').textContent = tabTitles[tabId] || '';
+        if (window.innerWidth < 768) setCollapsed(true);
+    }
 
-        /* Sync creditsDisplay in sidebar and topbar */
-        const _origCreditsDisplay = document.getElementById('creditsDisplay');
-        const creditsTop = document.getElementById('creditsTop');
-        const observer = new MutationObserver(() => {
-            creditsTop.textContent = _origCreditsDisplay.textContent;
-        });
-        observer.observe(_origCreditsDisplay, { childList: true, characterData: true, subtree: true });
-    </script>
+    /* Sync créditos sidebar → topbar */
+    const creditsEl  = document.getElementById('creditsDisplay');
+    const creditsTop = document.getElementById('creditsTop');
+    new MutationObserver(() => {
+        creditsTop.textContent = creditsEl.textContent;
+    }).observe(creditsEl, { childList:true, characterData:true, subtree:true });
+</script>
 
-    <script type="module" src="app/main.js"></script>
+<script type="module" src="app/main.js"></script>
 </body>
-</html>
+    </html>
