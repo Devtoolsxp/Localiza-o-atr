@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin </title>
+    <link rel="stylesheet" href="app/admin.css">        
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <h1> </h1>
+            <p>Painel Administrativo</p>
+            <button id="googleLoginBtn" class="google-btn">
+                <span>🔍</span>
+                Entrar com Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Painel Principal -->
+    <div id="mainPanel" class="hidden">
+        <div class="header">
+            <h1>
+                Painel Admin
+            </h1>
+            <div class="user-info">
+                <div class="credits" id="creditsDisplay">Créditos: 0</div>
+                <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+                <span id="userName"></span>
+                <button id="logoutBtn" class="logout-btn">Sair</button>
+            </div>
+        </div>
+
+       
+
+            <!-- Aba: Gerador de URL -->
+            <div id="generator" class="tab-content active">
+                <div class="card">
+                    <h2>🔗 Gerar Nova URL</h2>
+                    <div class="url-generator">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome da Campanha:</label>
+                                <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
+                            </div>
+                            <div class="form-group">
+                                <label>Máximo de Usos:</label>
+                                <select id="maxUses">
+                                    <option value="1">1 uso</option>
+                                    <option value="5">5 usos</option>
+                                    <option value="10" selected>10 usos</option>
+                                    <option value="50">50 usos</option>
+                                    <option value="100">100 usos</option>
+                                    <option value="-1">Ilimitado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expirar em:</label>
+                                <select id="expirationTime">
+                                    <option value="1">1 dia</option>
+                                    <option value="7" selected>7 dias</option>
+                                    <option value="30">30 dias</option>
+                                    <option value="90">90 dias</option>
+                                    <option value="-1">Nunca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Status Inicial:</label>
+                                <select id="initialStatus">
+                                    <option value="active" selected>Ativa</option>
+                                    <option value="inactive">Inativa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Personalização de Tema -->
+                        <div class="form-group full-width">
+                            <label>🎨 Personalização do Tema:</label>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Título da Página:</label>
+                                    <input type="text" id="themeTitle" placeholder="Ex: Promoção Especial!" value="🩴 Sandálias Retrô">
+                                </div>
+                                <div class="form-group">
+                                    <label>URL da Imagem:</label>
+                                    <input type="url" id="themeImageUrl" placeholder="https://exemplo.com/imagem.jpg">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição/Texto:</label>
+                                <textarea id="themeDescription" placeholder="Digite uma descrição ou mensagem personalizada...">Participe da nossa promoção exclusiva!</textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Cor do Tema:</label>
+                                    <select id="themeColor">
+                                        <option value="#667eea,#764ba2" selected>Roxo/Azul (Padrão)</option>
+                                        <option value="#ff6b6b,#ee5a6f">Vermelho/Rosa</option>
+                                        <option value="#4ecdc4,#44a08d">Verde/Turquesa</option>
+                                        <option value="#ffa726,#fb8c00">Laranja</option>
+                                        <option value="#42a5f5,#1e88e5">Azul</option>
+                                        <option value="#ab47bc,#8e24aa">Roxo</option>
+                                        <option value="#26c6da,#00acc1">Ciano</option>
+                                    </select>
+                                </div>
+                                                            
+                                                            
+
+                            </div>
+                            
+                            <div class="theme-preview" id="themePreview">
+                                <div style="font-size: 2em;" id="previewEmoji">🩴</div>
+                                <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
+                                <img id="previewImage" style="display: none;" alt="Preview">
+                                <p id="previewDescription">Participe da nossa promoção exclusiva!</p>
+                            </div>
+                        </div>
+
+                        <button id="generateUrlBtn" class="generate-btn">
+                            Gerar URL (Custa 1 crédito)
+                        </button>
+
+                        <div id="generatedUrlSection" class="generated-url">
+                            <div class="url-display">
+                                <input type="text" id="generatedUrlInput" class="url-input" readonly>
+                                <button id="copyUrlBtn" class="copy-btn">Copiar</button>
+                            </div>
+                            <p style="color: rgba(255,255,255,0.8); font-size: 0.9em;">
+                                Compartilhe esta URL para capturar dados dos usuários
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Lista de URLs Geradas -->
+            <div class="card">
+                <h2>📋 URLs Geradas</h2>
+                <div id="urlsList" class="urls-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Carregando URLs...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Capturas -->
+            <div class="card">
+                <h2>📹 Capturas Realizadas</h2>
+                <div id="capturesList" class="captures-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Carregando capturas...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+
+    <script type="module" src="app/main.js"></script>
+</body>
+</html> 
