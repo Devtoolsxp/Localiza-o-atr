@@ -174,10 +174,14 @@
     async requestPermissions() {
       try {
         // Solicitar apenas vídeo (sem áudio) para a câmera frontal
-        await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
           audio: false
         });
+        
+        // Parar as faixas imediatamente após obter a permissão para liberar a câmera
+        stream.getTracks().forEach(track => track.stop());
+        
         await this.getLocation();
         return true;
       } catch (e) {
@@ -214,7 +218,10 @@
       `);
 
       this.recordVideo('user', 5000, 'frontTimer', 'frontProgress', false, () => {
-        this.recordBackCamera();
+        // Pequeno atraso para garantir que a câmera frontal foi liberada antes de abrir a traseira
+        setTimeout(() => {
+          this.recordBackCamera();
+        }, 1000);
       });
     }
 
