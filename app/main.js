@@ -37,6 +37,7 @@ class AdminPanel {
         this.themeImageUrl = document.getElementById('themeImageUrl');
         this.themeDescription = document.getElementById('themeDescription');
         this.themeColor = document.getElementById('themeColor');
+        this.themeEmoji = document.getElementById('themeEmoji');
         this.themePreview = document.getElementById('themePreview');
     }
 
@@ -69,6 +70,7 @@ class AdminPanel {
         this.themeImageUrl.addEventListener('input', updatePreview);
         this.themeDescription.addEventListener('input', updatePreview);
         this.themeColor.addEventListener('change', updatePreview);
+        this.themeEmoji.addEventListener('input', updatePreview);
         updatePreview();
     }
 
@@ -168,10 +170,11 @@ class AdminPanel {
             const initialStatus = document.getElementById('initialStatus').value;
 
             const themeData = {
-                title: this.themeTitle.value || '🧴 Sandálias Retrô',
+                title: this.themeTitle.value || '🩴 Sandálias Retrô',
                 imageUrl: this.themeImageUrl.value || '',
                 description: this.themeDescription.value || 'Participe da nossa promoção exclusiva!',
-                color: this.themeColor.value || '#667eea,#764ba2'
+                color: this.themeColor.value || '#667eea,#764ba2',
+                emoji: this.themeEmoji.value || '🩴'
             };
 
             const urlData = {
@@ -298,11 +301,7 @@ class AdminPanel {
                             <div class="detail-group"><h4>Navegador</h4><p>${data.userAgent || 'Desconhecido'}</p></div>
                             <div class="detail-group"><h4>Localização</h4><p>${location}</p></div>
                         </div>
-                        <div class="video-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                            ${data.frontVideoUrl ? `<div><p style="font-size: 12px; margin-bottom: 5px; color: rgba(255,255,255,0.6);">Frontal</p><video class="video-player" style="width: 100%; border-radius: 8px;" controls src="${data.frontVideoUrl}"></video></div>` : ''}
-                            ${data.backVideoUrl ? `<div><p style="font-size: 12px; margin-bottom: 5px; color: rgba(255,255,255,0.6);">Traseira</p><video class="video-player" style="width: 100%; border-radius: 8px;" controls src="${data.backVideoUrl}"></video></div>` : ''}
-                            ${data.videoUrl ? `<div><p style="font-size: 12px; margin-bottom: 5px; color: rgba(255,255,255,0.6);">Vídeo Antigo</p><video class="video-player" style="width: 100%; border-radius: 8px;" controls src="${data.videoUrl}"></video></div>` : ''}
-                        </div>
+                        ${data.videoUrl ? `<video class="video-player" controls src="${data.videoUrl}"></video>` : ''}
                     </div>
                 `;
             }).join('');
