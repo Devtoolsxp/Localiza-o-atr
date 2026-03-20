@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #f7f7f5;
+            --bg: #f5f4f0;
             --surface: #ffffff;
             --border: #e4e4e0;
             --border-strong: #c8c8c2;
@@ -24,13 +24,17 @@
             --success-light: #f0f9f4;
             --warning: #b5620d;
             --warning-light: #fdf6ee;
+            --gold: #c9a84c;
+            --gold-light: #f9f4e8;
+            --header-bg: #111110;
             --radius-sm: 6px;
             --radius-md: 10px;
             --radius-lg: 14px;
             --font: 'DM Sans', sans-serif;
             --font-mono: 'DM Mono', monospace;
+            --font-display: 'Playfair Display', serif;
             --sidebar-w: 220px;
-            --header-h: 56px;
+            --header-h: 44px;
         }
 
         body {
@@ -100,61 +104,75 @@
             min-height: 100vh;
         }
 
-        /* ── HEADER ── */
+        /* ── HEADER CASSINO ── */
         .header {
             height: var(--header-h);
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+            background: var(--header-bg);
+            border-bottom: 1px solid #2a2a28;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 20px;
             position: sticky;
             top: 0;
             z-index: 100;
         }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+        }
         .header h1 {
-            font-size: 15px;
+            font-family: var(--font-display);
+            font-size: 13px;
             font-weight: 500;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
+            color: var(--gold);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
         }
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         .credits {
-            font-size: 12px;
+            font-size: 11px;
             font-family: var(--font-mono);
-            color: var(--text-secondary);
-            background: var(--accent-light);
-            border: 1px solid var(--border);
+            color: var(--gold);
+            background: rgba(201,168,76,0.10);
+            border: 1px solid rgba(201,168,76,0.25);
             border-radius: 100px;
-            padding: 4px 12px;
+            padding: 3px 10px;
+            letter-spacing: 0.04em;
         }
         .user-avatar {
-            width: 28px; height: 28px;
+            width: 24px; height: 24px;
             border-radius: 50%;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(201,168,76,0.3);
             object-fit: cover;
         }
         #userName {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 11px;
+            color: #6b6b65;
+            letter-spacing: 0.02em;
         }
         .logout-btn {
             font-family: var(--font);
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 11px;
+            color: #6b6b65;
             background: none;
-            border: 1px solid var(--border);
+            border: 1px solid #2a2a28;
             border-radius: var(--radius-sm);
-            padding: 5px 12px;
+            padding: 4px 10px;
             cursor: pointer;
             transition: all 0.15s;
         }
-        .logout-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+        .logout-btn:hover { color: var(--danger); border-color: var(--danger); }
 
         /* ── BODY LAYOUT ── */
         .layout-body {
@@ -516,9 +534,12 @@
 
     <!-- HEADER -->
     <header class="header">
-        <h1>Painel Admin</h1>
+        <div class="header-left">
+            <div class="header-dot"></div>
+            <h1>Painel Admin</h1>
+        </div>
         <div class="user-info">
-            <span class="credits" id="creditsDisplay">Créditos: 0</span>
+            <span class="credits" id="creditsDisplay">0 créditos</span>
             <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
             <span id="userName"></span>
             <button id="logoutBtn" class="logout-btn">Sair</button>
@@ -547,6 +568,12 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 </span>
                 Capturas
+            </div>
+            <div class="nav-item" data-page="videos">
+                <span class="nav-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                </span>
+                Vídeos Salvos
             </div>
         </nav>
 
@@ -681,6 +708,21 @@
                 </div>
             </div>
 
+            <!-- ── PAGE: VIDEOS ── -->
+            <div id="page-videos" class="page">
+                <p class="page-title">Vídeos Salvos</p>
+                <p class="page-subtitle">Todos os vídeos capturados e armazenados</p>
+
+                <div class="card" style="padding: 0;">
+                    <div id="videosList">
+                        <div class="state-loading">
+                            <div class="spinner"></div>
+                            Carregando vídeos...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 </div>
@@ -740,4 +782,4 @@
 
 <script type="module" src="app/main.js"></script>
 </body>
-    </html>
+                                                    </html>
