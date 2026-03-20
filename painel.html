@@ -1,785 +1,177 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg: #f5f4f0;
-            --surface: #ffffff;
-            --border: #e4e4e0;
-            --border-strong: #c8c8c2;
-            --text-primary: #1a1a18;
-            --text-secondary: #6b6b65;
-            --text-muted: #9c9c96;
-            --accent: #1a1a18;
-            --accent-light: #f0f0ec;
-            --danger: #c0392b;
-            --danger-light: #fdf2f0;
-            --success: #1a7a4a;
-            --success-light: #f0f9f4;
-            --warning: #b5620d;
-            --warning-light: #fdf6ee;
-            --gold: #c9a84c;
-            --gold-light: #f9f4e8;
-            --header-bg: #111110;
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --font: 'DM Sans', sans-serif;
-            --font-mono: 'DM Mono', monospace;
-            --font-display: 'Playfair Display', serif;
-            --sidebar-w: 220px;
-            --header-h: 44px;
-        }
-
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text-primary);
-            font-size: 14px;
-            line-height: 1.5;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ── LOGIN ── */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-        }
-        .login-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 48px 40px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-        }
-        .login-card h1 {
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            margin-bottom: 6px;
-            color: var(--text-primary);
-        }
-        .login-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-        .google-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 11px 20px;
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-sm);
-            font-family: var(--font);
-            font-size: 14px;
-            font-weight: 400;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
-        }
-        .google-btn:hover { background: var(--accent-light); border-color: var(--border-strong); }
-
-        /* ── LAYOUT ── */
-        .hidden { display: none !important; }
-
-        #mainPanel {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* ── HEADER CASSINO ── */
-        .header {
-            height: var(--header-h);
-            background: var(--header-bg);
-            border-bottom: 1px solid #2a2a28;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .header-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--gold);
-        }
-        .header h1 {
-            font-family: var(--font-display);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--gold);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .credits {
-            font-size: 11px;
-            font-family: var(--font-mono);
-            color: var(--gold);
-            background: rgba(201,168,76,0.10);
-            border: 1px solid rgba(201,168,76,0.25);
-            border-radius: 100px;
-            padding: 3px 10px;
-            letter-spacing: 0.04em;
-        }
-        .user-avatar {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 1px solid rgba(201,168,76,0.3);
-            object-fit: cover;
-        }
-        #userName {
-            font-size: 11px;
-            color: #6b6b65;
-            letter-spacing: 0.02em;
-        }
-        .logout-btn {
-            font-family: var(--font);
-            font-size: 11px;
-            color: #6b6b65;
-            background: none;
-            border: 1px solid #2a2a28;
-            border-radius: var(--radius-sm);
-            padding: 4px 10px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .logout-btn:hover { color: var(--danger); border-color: var(--danger); }
-
-        /* ── BODY LAYOUT ── */
-        .layout-body {
-            display: flex;
-            flex: 1;
-        }
-
-        /* ── SIDEBAR NAV ── */
-        .sidebar {
-            width: var(--sidebar-w);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 20px 12px;
-            flex-shrink: 0;
-            position: sticky;
-            top: var(--header-h);
-            height: calc(100vh - var(--header-h));
-            overflow-y: auto;
-        }
-        .nav-label {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            padding: 0 10px;
-            margin-bottom: 6px;
-            margin-top: 16px;
-        }
-        .nav-label:first-child { margin-top: 0; }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.12s;
-            border: 1px solid transparent;
-            user-select: none;
-        }
-        .nav-item:hover { background: var(--accent-light); color: var(--text-primary); }
-        .nav-item.active {
-            background: var(--accent-light);
-            color: var(--text-primary);
-            border-color: var(--border);
-            font-weight: 500;
-        }
-        .nav-icon {
-            width: 16px; height: 16px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-
-        /* ── MAIN CONTENT ── */
-        .main-content {
-            flex: 1;
-            padding: 28px 32px;
-            overflow-y: auto;
-        }
-
-        /* ── PAGES ── */
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.18s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        .page-title {
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            margin-bottom: 4px;
-        }
-        .page-subtitle {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 28px;
-        }
-
-        /* ── CARD ── */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-        .card-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 18px;
-            letter-spacing: -0.01em;
-        }
-
-        /* ── FORMS ── */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .form-group.full { grid-column: 1 / -1; }
-        label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            letter-spacing: 0.01em;
-        }
-        input[type="text"],
-        input[type="url"],
-        select,
-        textarea {
-            font-family: var(--font);
-            font-size: 13px;
-            color: var(--text-primary);
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 8px 12px;
-            outline: none;
-            transition: border-color 0.15s;
-            width: 100%;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--border-strong); }
-        textarea { resize: vertical; min-height: 80px; }
-        select { appearance: none; cursor: pointer; }
-
-        /* ── THEME PREVIEW ── */
-        .theme-preview {
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            background: var(--accent-light);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            text-align: center;
-        }
-        .theme-preview h3 { font-size: 14px; font-weight: 500; }
-        .theme-preview p { font-size: 12px; color: var(--text-secondary); }
-        #previewImage { max-width: 80px; max-height: 60px; border-radius: var(--radius-sm); object-fit: cover; }
-
-        /* ── BUTTONS ── */
-        .btn-primary {
-            font-family: var(--font);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--surface);
-            background: var(--text-primary);
-            border: 1px solid var(--text-primary);
-            border-radius: var(--radius-sm);
-            padding: 9px 20px;
-            cursor: pointer;
-            transition: opacity 0.15s;
-        }
-        .btn-primary:hover { opacity: 0.8; }
-
-        .btn-ghost {
-            font-family: var(--font);
-            font-size: 12px;
-            color: var(--text-secondary);
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 6px 14px;
-            cursor: pointer;
-            transition: all 0.12s;
-        }
-        .btn-ghost:hover { background: var(--accent-light); color: var(--text-primary); border-color: var(--border-strong); }
-
-        .generate-btn {
-            font-family: var(--font);
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--surface);
-            background: var(--text-primary);
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 10px 22px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: opacity 0.15s;
-        }
-        .generate-btn:hover { opacity: 0.75; }
-
-        /* ── GENERATED URL ── */
-        .generated-url {
-            margin-top: 16px;
-            padding: 16px;
-            background: var(--accent-light);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            display: none;
-        }
-        .generated-url.visible { display: block; }
-        .url-display {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .url-input {
-            flex: 1;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-primary);
-            outline: none;
-        }
-        .copy-btn {
-            font-family: var(--font);
-            font-size: 12px;
-            font-weight: 500;
-            padding: 8px 16px;
-            background: var(--text-primary);
-            color: var(--surface);
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: opacity 0.15s;
-        }
-        .copy-btn:hover { opacity: 0.75; }
-        .url-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ── TABLE ── */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .data-table th {
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--text-muted);
-            text-align: left;
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-        }
-        .data-table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-            color: var(--text-primary);
-            vertical-align: middle;
-        }
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover td { background: var(--bg); }
-
-        /* ── BADGES ── */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            padding: 3px 8px;
-            border-radius: 100px;
-        }
-        .badge-active { background: var(--success-light); color: var(--success); }
-        .badge-inactive { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
-        .badge-expired { background: var(--danger-light); color: var(--danger); }
-
-        /* ── EMPTY / LOADING ── */
-        .state-empty, .state-loading {
-            text-align: center;
-            padding: 48px 20px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-        .spinner {
-            width: 20px; height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--text-primary);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── MONO TEXT ── */
-        .mono { font-family: var(--font-mono); font-size: 12px; }
-
-        /* ── ACTION LINK ── */
-        .action-link {
-            font-size: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 2px;
-            background: none;
-            border: none;
-            padding: 0;
-            font-family: var(--font);
-            transition: color 0.12s;
-        }
-        .action-link:hover { color: var(--text-primary); }
-        .action-link.danger { color: var(--danger); }
-
-        /* ── CAPTURE THUMB ── */
-        .capture-thumb {
-            width: 48px; height: 36px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            object-fit: cover;
-            background: var(--bg);
-        }
-
-        /* ── DIVIDER ── */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 20px 0;
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-content { padding: 20px 16px; }
-            .form-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin </title>
+    <link rel="stylesheet" href="app/admin.css">        
 </head>
 <body>
-
-<!-- ══════════════ LOGIN ══════════════ -->
-<div id="loginScreen" class="login-container">
-    <div class="login-card">
-        <h1>Painel Admin</h1>
-        <p>Faça login para continuar</p>
-        <button id="googleLoginBtn" class="google-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Entrar com Google
-        </button>
-    </div>
-</div>
-
-<!-- ══════════════ MAIN PANEL ══════════════ -->
-<div id="mainPanel" class="hidden">
-
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-left">
-            <div class="header-dot"></div>
-            <h1>Painel Admin</h1>
+    <!-- Tela de Login -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <h1> </h1>
+            <p>Painel Administrativo</p>
+            <button id="googleLoginBtn" class="google-btn">
+                <span>🔍</span>
+                Entrar com Google
+            </button>
         </div>
-        <div class="user-info">
-            <span class="credits" id="creditsDisplay">0 créditos</span>
-            <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
-            <span id="userName"></span>
-            <button id="logoutBtn" class="logout-btn">Sair</button>
-        </div>
-    </header>
-
-    <div class="layout-body">
-
-        <!-- SIDEBAR -->
-        <nav class="sidebar">
-            <div class="nav-label">Principal</div>
-            <div class="nav-item active" data-page="generator">
-                <span class="nav-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                </span>
-                Gerar URL
-            </div>
-            <div class="nav-item" data-page="urls">
-                <span class="nav-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                </span>
-                URLs Geradas
-            </div>
-            <div class="nav-item" data-page="captures">
-                <span class="nav-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                </span>
-                Capturas
-            </div>
-            <div class="nav-item" data-page="videos">
-                <span class="nav-icon">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-                </span>
-                Vídeos Salvos
-            </div>
-        </nav>
-
-        <!-- CONTENT AREA -->
-        <main class="main-content">
-
-            <!-- ── PAGE: GENERATOR ── -->
-            <div id="page-generator" class="page active">
-                <p class="page-title">Gerar Nova URL</p>
-                <p class="page-subtitle">Configure a campanha e personalize a página de captura</p>
-
-                <div class="card">
-                    <p class="card-title">Configurações da Campanha</p>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Nome da Campanha</label>
-                            <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
-                        </div>
-                        <div class="form-group">
-                            <label>Máximo de Usos</label>
-                            <select id="maxUses">
-                                <option value="1">1 uso</option>
-                                <option value="5">5 usos</option>
-                                <option value="10" selected>10 usos</option>
-                                <option value="50">50 usos</option>
-                                <option value="100">100 usos</option>
-                                <option value="-1">Ilimitado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Expirar em</label>
-                            <select id="expirationTime">
-                                <option value="1">1 dia</option>
-                                <option value="7" selected>7 dias</option>
-                                <option value="30">30 dias</option>
-                                <option value="90">90 dias</option>
-                                <option value="-1">Nunca</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Status Inicial</label>
-                            <select id="initialStatus">
-                                <option value="active" selected>Ativa</option>
-                                <option value="inactive">Inativa</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <p class="card-title">Personalização do Tema</p>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Título da Página</label>
-                            <input type="text" id="themeTitle" placeholder="Ex: Promoção Especial!" value="🩴 Sandálias Retrô">
-                        </div>
-                        <div class="form-group">
-                            <label>URL da Imagem</label>
-                            <input type="url" id="themeImageUrl" placeholder="https://exemplo.com/imagem.jpg">
-                        </div>
-                        <div class="form-group full">
-                            <label>Descrição / Texto</label>
-                            <textarea id="themeDescription" placeholder="Digite uma descrição ou mensagem personalizada...">Participe da nossa promoção exclusiva!</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Cor do Tema</label>
-                            <select id="themeColor">
-                                <option value="#667eea,#764ba2" selected>Roxo / Azul</option>
-                                <option value="#ff6b6b,#ee5a6f">Vermelho / Rosa</option>
-                                <option value="#4ecdc4,#44a08d">Verde / Turquesa</option>
-                                <option value="#ffa726,#fb8c00">Laranja</option>
-                                <option value="#42a5f5,#1e88e5">Azul</option>
-                                <option value="#ab47bc,#8e24aa">Roxo</option>
-                                <option value="#26c6da,#00acc1">Ciano</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Câmera</label>
-                            <select id="themeEmoji">
-                                <option value="1">Traseira</option>
-                                <option value="5">Frontal</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="theme-preview" id="themePreview">
-                        <div style="font-size: 1.6em;" id="previewEmoji">🩴</div>
-                        <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
-                        <img id="previewImage" style="display: none;" alt="Preview">
-                        <p id="previewDescription">Participe da nossa promoção exclusiva!</p>
-                    </div>
-                </div>
-
-                <button id="generateUrlBtn" class="generate-btn">Gerar URL — custa 1 crédito</button>
-
-                <div id="generatedUrlSection" class="generated-url">
-                    <div class="url-display">
-                        <input type="text" id="generatedUrlInput" class="url-input" readonly>
-                        <button id="copyUrlBtn" class="copy-btn">Copiar</button>
-                    </div>
-                    <p class="url-hint">Compartilhe esta URL para capturar dados dos usuários</p>
-                </div>
-            </div>
-
-            <!-- ── PAGE: URLS ── -->
-            <div id="page-urls" class="page">
-                <p class="page-title">URLs Geradas</p>
-                <p class="page-subtitle">Gerencie e monitore suas campanhas ativas</p>
-
-                <div class="card" style="padding: 0;">
-                    <div id="urlsList">
-                        <div class="state-loading">
-                            <div class="spinner"></div>
-                            Carregando URLs...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── PAGE: CAPTURES ── -->
-            <div id="page-captures" class="page">
-                <p class="page-title">Capturas Realizadas</p>
-                <p class="page-subtitle">Visualize todas as capturas de mídia registradas</p>
-
-                <div class="card" style="padding: 0;">
-                    <div id="capturesList">
-                        <div class="state-loading">
-                            <div class="spinner"></div>
-                            Carregando capturas...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── PAGE: VIDEOS ── -->
-            <div id="page-videos" class="page">
-                <p class="page-title">Vídeos Salvos</p>
-                <p class="page-subtitle">Todos os vídeos capturados e armazenados</p>
-
-                <div class="card" style="padding: 0;">
-                    <div id="videosList">
-                        <div class="state-loading">
-                            <div class="spinner"></div>
-                            Carregando vídeos...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </main>
     </div>
-</div>
 
-<!-- Firebase SDK -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+    <!-- Painel Principal -->
+    <div id="mainPanel" class="hidden">
+        <div class="header">
+            <h1>
+                Painel Admin
+            </h1>
+            <div class="user-info">
+                <div class="credits" id="creditsDisplay">Créditos: 0</div>
+                <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+                <span id="userName"></span>
+                <button id="logoutBtn" class="logout-btn">Sair</button>
+            </div>
+        </div>
 
-<!-- Navigation -->
-<script>
-    (function () {
-        const navItems = document.querySelectorAll('.nav-item[data-page]');
-        const pages = document.querySelectorAll('.page');
+       
 
-        function navigateToPage(pageId) {
-            navItems.forEach(n => n.classList.toggle('active', n.dataset.page === pageId));
-            pages.forEach(p => p.classList.toggle('active', p.id === 'page-' + pageId));
-        }
+            <!-- Aba: Gerador de URL -->
+            <div id="generator" class="tab-content active">
+                <div class="card">
+                    <h2>🔗 Gerar Nova URL</h2>
+                    <div class="url-generator">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nome da Campanha:</label>
+                                <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
+                            </div>
+                            <div class="form-group">
+                                <label>Máximo de Usos:</label>
+                                <select id="maxUses">
+                                    <option value="1">1 uso</option>
+                                    <option value="5">5 usos</option>
+                                    <option value="10" selected>10 usos</option>
+                                    <option value="50">50 usos</option>
+                                    <option value="100">100 usos</option>
+                                    <option value="-1">Ilimitado</option>
+                                </select>
+                            </div>
+                        </div>
 
-        navItems.forEach(item => {
-            item.addEventListener('click', () => navigateToPage(item.dataset.page));
-        });
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expirar em:</label>
+                                <select id="expirationTime">
+                                    <option value="1">1 dia</option>
+                                    <option value="7" selected>7 dias</option>
+                                    <option value="30">30 dias</option>
+                                    <option value="90">90 dias</option>
+                                    <option value="-1">Nunca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Status Inicial:</label>
+                                <select id="initialStatus">
+                                    <option value="active" selected>Ativa</option>
+                                    <option value="inactive">Inativa</option>
+                                </select>
+                            </div>
+                        </div>
 
-        // Theme preview sync
-        const titleInput = document.getElementById('themeTitle');
-        const descInput = document.getElementById('themeDescription');
-        const imgInput = document.getElementById('themeImageUrl');
+                        <!-- Personalização de Tema -->
+                        <div class="form-group full-width">
+                            <label>🎨 Personalização do Tema:</label>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Título da Página:</label>
+                                    <input type="text" id="themeTitle" placeholder="Ex: Promoção Especial!" value="🩴 Sandálias Retrô">
+                                </div>
+                                <div class="form-group">
+                                    <label>URL da Imagem:</label>
+                                    <input type="url" id="themeImageUrl" placeholder="https://exemplo.com/imagem.jpg">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Descrição/Texto:</label>
+                                <textarea id="themeDescription" placeholder="Digite uma descrição ou mensagem personalizada...">Participe da nossa promoção exclusiva!</textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Cor do Tema:</label>
+                                    <select id="themeColor">
+                                        <option value="#667eea,#764ba2" selected>Roxo/Azul (Padrão)</option>
+                                        <option value="#ff6b6b,#ee5a6f">Vermelho/Rosa</option>
+                                        <option value="#4ecdc4,#44a08d">Verde/Turquesa</option>
+                                        <option value="#ffa726,#fb8c00">Laranja</option>
+                                        <option value="#42a5f5,#1e88e5">Azul</option>
+                                        <option value="#ab47bc,#8e24aa">Roxo</option>
+                                        <option value="#26c6da,#00acc1">Ciano</option>
+                                    </select>
+                                </div>
+                                                            
+                                                            
+                               <div class="form-group">
+                                <label>Câmera:</label>
+                                <select id="themeEmoji">
+                                    <option value="1">trazeira</option>
+                                    <option value="5">frontal</option>
+                                </select>
+                              </div> 
+                            </div>
+                            
+                            <div class="theme-preview" id="themePreview">
+                                <div style="font-size: 2em;" id="previewEmoji">🩴</div>
+                                <h3 id="previewTitle">🩴 Sandálias Retrô</h3>
+                                <img id="previewImage" style="display: none;" alt="Preview">
+                                <p id="previewDescription">Participe da nossa promoção exclusiva!</p>
+                            </div>
+                        </div>
 
-        if (titleInput) {
-            titleInput.addEventListener('input', () => {
-                const el = document.getElementById('previewTitle');
-                const em = document.getElementById('previewEmoji');
-                if (el) el.textContent = titleInput.value;
-            });
-        }
-        if (descInput) {
-            descInput.addEventListener('input', () => {
-                const el = document.getElementById('previewDescription');
-                if (el) el.textContent = descInput.value;
-            });
-        }
-        if (imgInput) {
-            imgInput.addEventListener('input', () => {
-                const img = document.getElementById('previewImage');
-                if (!img) return;
-                if (imgInput.value) {
-                    img.src = imgInput.value;
-                    img.style.display = 'block';
-                } else {
-                    img.style.display = 'none';
-                }
-            });
-        }
-    })();
-</script>
+                        <button id="generateUrlBtn" class="generate-btn">
+                            Gerar URL (Custa 1 crédito)
+                        </button>
 
-<script type="module" src="app/main.js"></script>
+                        <div id="generatedUrlSection" class="generated-url">
+                            <div class="url-display">
+                                <input type="text" id="generatedUrlInput" class="url-input" readonly>
+                                <button id="copyUrlBtn" class="copy-btn">Copiar</button>
+                            </div>
+                            <p style="color: rgba(255,255,255,0.8); font-size: 0.9em;">
+                                Compartilhe esta URL para capturar dados dos usuários
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Lista de URLs Geradas -->
+            <div class="card">
+                <h2>📋 URLs Geradas</h2>
+                <div id="urlsList" class="urls-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Carregando URLs...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Capturas -->
+            <div class="card">
+                <h2>📹 Capturas Realizadas</h2>
+                <div id="capturesList" class="captures-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Carregando capturas...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+
+    <script type="module" src="app/main.js"></script>
 </body>
-                                                    </html>
+</html> 
