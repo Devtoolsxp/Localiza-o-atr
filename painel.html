@@ -227,7 +227,7 @@
         #contentArea {
             flex: 1 1 0;
             overflow-y: auto;
-            padding: 22px;
+            padding: 28px 32px;
             scrollbar-width: thin;
             scrollbar-color: var(--bg-hover) transparent;
         }
@@ -251,14 +251,14 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--r);
-            padding: 22px;
-            margin-bottom: 18px;
+            padding: 32px 36px;
+            margin-bottom: 22px;
         }
         .card h2 {
-            font-size: 1.1em; font-weight: 700;
+            font-size: 1.25em; font-weight: 700;
             color: var(--txt1);
-            margin-bottom: 18px;
-            display: flex; align-items: center; gap: 9px;
+            margin-bottom: 22px;
+            display: flex; align-items: center; gap: 10px;
         }
 
         /* ════════════════════════════════
@@ -352,28 +352,29 @@
         }
         .copy-btn:hover { background: #818cf8; }
 
-        .urls-list     { max-height:420px; overflow-y:auto; display:grid; gap:9px; }
-        .captures-list { max-height:700px; overflow-y:auto; display:grid; gap:11px; }
+        .urls-list     { max-height:420px; overflow-y:auto; display:grid; gap:7px; }
+        .captures-list { max-height:700px; overflow-y:auto; display:grid; gap:8px; }
 
         .url-item, .capture-item {
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 15px; color: var(--txt1);
+            border-radius: 8px;
+            padding: 10px 13px; color: var(--txt1);
             transition: border-color var(--ease);
+            font-size: 0.82em;
         }
         .url-item:hover, .capture-item:hover { border-color: rgba(99,102,241,.3); }
 
         .url-header, .capture-header {
             display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:9px;
+            margin-bottom:6px;
         }
-        .url-controls { display:flex; gap:8px; margin-top:11px; }
+        .url-controls { display:flex; gap:6px; margin-top:8px; }
 
         .toggle-btn {
-            border:none; border-radius:7px;
-            color:#fff; font-family:inherit; font-size:.8em; font-weight:700;
-            padding:6px 13px; cursor:pointer;
+            border:none; border-radius:6px;
+            color:#fff; font-family:inherit; font-size:.72em; font-weight:700;
+            padding:5px 10px; cursor:pointer;
             transition: filter var(--ease), transform var(--ease);
         }
         .toggle-btn.active   { background:var(--success); }
@@ -381,8 +382,8 @@
         .toggle-btn:hover    { filter:brightness(1.15); transform:translateY(-1px); }
 
         .url-status {
-            padding:3px 11px; border-radius:20px;
-            font-size:.75em; font-weight:700;
+            padding:2px 9px; border-radius:20px;
+            font-size:.68em; font-weight:700;
             font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
         }
         .status-active   { background:rgba(16,185,129,.14);  color:var(--success); border:1px solid rgba(16,185,129,.3); }
@@ -395,16 +396,16 @@
             margin-top:9px; font-size:.83em; color:var(--txt2);
         }
 
-        .capture-date { font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:.83em; }
+        .capture-date { font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:.76em; }
         .capture-details {
             display:grid; grid-template-columns:1fr 1fr;
-            gap:11px; margin-bottom:11px;
+            gap:8px; margin-bottom:8px;
         }
         .detail-group h4 {
-            color:var(--warning); margin-bottom:3px;
-            font-size:.75em; text-transform:uppercase; letter-spacing:.06em;
+            color:var(--warning); margin-bottom:2px;
+            font-size:.68em; text-transform:uppercase; letter-spacing:.06em;
         }
-        .detail-group p { font-size:.83em; line-height:1.5; color:var(--txt2); }
+        .detail-group p { font-size:.76em; line-height:1.4; color:var(--txt2); }
         .video-player { width:100%; max-width:400px; border-radius:10px; margin-top:9px; }
 
         .loading {
