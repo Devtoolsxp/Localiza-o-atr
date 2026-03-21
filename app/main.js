@@ -323,33 +323,40 @@ class AdminPanel {
 
                     // Vídeo frontal
                     const videoFrontal = c.videoFrontalUrl
-                        ? `<div style="flex:1;min-width:0;">
-                               <p style="font-size:0.72rem;color:#aaa;text-align:center;margin:0 0 5px;">📱 Câmera Frontal</p>
+                        ? `<div style="width:100%;margin-bottom:12px;">
+                               <p style="font-size:0.78rem;color:#a78bfa;font-weight:700;margin:0 0 6px;display:flex;align-items:center;gap:5px;">
+                                   <span style="font-size:1em;">📱</span> Câmera Frontal
+                               </p>
                                <video controls playsinline preload="metadata"
-                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   style="width:100%;max-height:320px;border-radius:10px;background:#000;display:block;border:1px solid rgba(167,139,250,0.25);">
                                    <source src="${c.videoFrontalUrl}" type="video/webm">
+                                   Seu navegador não suporta vídeo.
                                </video>
                            </div>`
                         : '';
 
                     // Vídeo traseiro
                     const videoTraseira = c.videoTrasieraUrl
-                        ? `<div style="flex:1;min-width:0;">
-                               <p style="font-size:0.72rem;color:#aaa;text-align:center;margin:0 0 5px;">🔭 Câmera Traseira</p>
+                        ? `<div style="width:100%;margin-bottom:12px;">
+                               <p style="font-size:0.78rem;color:#34d399;font-weight:700;margin:0 0 6px;display:flex;align-items:center;gap:5px;">
+                                   <span style="font-size:1em;">🔭</span> Câmera Traseira
+                               </p>
                                <video controls playsinline preload="metadata"
-                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   style="width:100%;max-height:320px;border-radius:10px;background:#000;display:block;border:1px solid rgba(52,211,153,0.25);">
                                    <source src="${c.videoTrasieraUrl}" type="video/webm">
+                                   Seu navegador não suporta vídeo.
                                </video>
                            </div>`
                         : '';
 
                     // Fallback para capturas antigas com videoUrl único
                     const videoLegacy = (!c.videoFrontalUrl && !c.videoTrasieraUrl && c.videoUrl)
-                        ? `<div style="width:100%;">
-                               <p style="font-size:0.72rem;color:#aaa;margin:0 0 5px;">🎥 Vídeo</p>
+                        ? `<div style="width:100%;margin-bottom:12px;">
+                               <p style="font-size:0.78rem;color:#aaa;font-weight:700;margin:0 0 6px;">🎥 Vídeo</p>
                                <video controls playsinline preload="metadata"
-                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   style="width:100%;max-height:320px;border-radius:10px;background:#000;display:block;">
                                    <source src="${c.videoUrl}" type="video/webm">
+                                   Seu navegador não suporta vídeo.
                                </video>
                            </div>`
                         : '';
@@ -362,8 +369,8 @@ class AdminPanel {
                             padding: 16px;
                             margin-bottom: 20px;
                         ">
-                            <!-- Vídeos lado a lado -->
-                            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+                            <!-- Vídeos empilhados: Frontal primeiro, depois Traseira -->
+                            <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;">
                                 ${videoFrontal}
                                 ${videoTraseira}
                                 ${videoLegacy}

