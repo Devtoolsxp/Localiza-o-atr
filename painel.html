@@ -40,9 +40,7 @@
             overflow: hidden;
         }
 
-        /* ════════════════════════════════
-           LOGIN
-        ════════════════════════════════ */
+        /* LOGIN */
         #loginScreen {
             position: fixed; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -77,26 +75,18 @@
             box-shadow: 0 4px 20px rgba(66,133,244,.3);
             transition: transform var(--ease), box-shadow var(--ease);
         }
-        .google-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(66,133,244,.45);
-        }
+        .google-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(66,133,244,.45); }
 
-        /* ════════════════════════════════
-           SHELL
-        ════════════════════════════════ */
+        /* SHELL */
         #mainPanel {
             position: fixed; inset: 0;
             display: flex; flex-direction: row;
             overflow: hidden;
         }
 
-        /* ════════════════════════════════
-           SIDEBAR
-        ════════════════════════════════ */
+        /* SIDEBAR */
         #sidebar {
-            width: var(--sw);
-            flex: 0 0 var(--sw);
+            width: var(--sw); flex: 0 0 var(--sw);
             display: flex; flex-direction: column;
             background: var(--bg-surface);
             border-right: 1px solid var(--border);
@@ -104,56 +94,40 @@
             transition: width var(--ease), flex-basis var(--ease);
             z-index: 10;
         }
-        #sidebar.collapsed {
-            width: var(--sw-sm);
-            flex-basis: var(--sw-sm);
-        }
+        #sidebar.collapsed { width: var(--sw-sm); flex-basis: var(--sw-sm); }
 
         .sb-header {
             display: flex; align-items: center; justify-content: space-between;
             height: var(--hh); padding: 0 14px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
+            border-bottom: 1px solid var(--border); flex-shrink: 0;
         }
         .sb-logo {
             font-size: 1.1em; font-weight: 800; color: var(--accent);
-            white-space: nowrap;
-            opacity: 1; max-width: 160px;
-            transition: opacity var(--ease), max-width var(--ease);
-            overflow: hidden;
+            white-space: nowrap; opacity: 1; max-width: 160px;
+            transition: opacity var(--ease), max-width var(--ease); overflow: hidden;
         }
         #sidebar.collapsed .sb-logo { opacity: 0; max-width: 0; }
 
         .sb-toggle {
-            flex-shrink: 0;
-            width: 30px; height: 30px;
+            flex-shrink: 0; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            background: var(--bg-hover);
-            border: 1px solid var(--border);
-            border-radius: 7px;
-            color: var(--txt2);
-            cursor: pointer;
+            background: var(--bg-hover); border: 1px solid var(--border);
+            border-radius: 7px; color: var(--txt2); cursor: pointer;
             font-size: 1.1em; line-height: 1;
             transition: background var(--ease), color var(--ease);
         }
         .sb-toggle:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .sb-nav {
-            flex: 1;
-            padding: 14px 8px;
-            display: flex; flex-direction: column; gap: 3px;
-            overflow: hidden;
+            flex: 1; padding: 14px 8px;
+            display: flex; flex-direction: column; gap: 3px; overflow: hidden;
         }
         .nav-item {
             display: flex; align-items: center; gap: 11px;
-            padding: 10px 11px;
-            border-radius: 9px;
-            border: 1px solid transparent;
-            color: var(--txt2);
-            cursor: pointer;
-            font-size: .9em; font-weight: 600;
-            white-space: nowrap;
-            text-decoration: none;
+            padding: 10px 11px; border-radius: 9px;
+            border: 1px solid transparent; color: var(--txt2);
+            cursor: pointer; font-size: .9em; font-weight: 600;
+            white-space: nowrap; text-decoration: none;
             transition: background var(--ease), color var(--ease), border-color var(--ease);
         }
         .nav-item:hover  { background: var(--bg-hover); color: var(--txt1); }
@@ -163,146 +137,86 @@
         #sidebar.collapsed .nav-label { opacity: 0; width: 0; }
 
         .sb-footer {
-            border-top: 1px solid var(--border);
-            padding: 12px 10px;
+            border-top: 1px solid var(--border); padding: 12px 10px;
             display: flex; align-items: center; gap: 10px;
             flex-shrink: 0; overflow: hidden;
         }
         #userAvatar {
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            border: 2px solid var(--border-active);
-            flex-shrink: 0; object-fit: cover;
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 2px solid var(--border-active); flex-shrink: 0; object-fit: cover;
         }
         .sb-user { overflow: hidden; opacity: 1; transition: opacity var(--ease); flex: 1; }
         #sidebar.collapsed .sb-user { opacity: 0; width: 0; }
-        #userName {
-            font-size: .83em; font-weight: 700; color: var(--txt1);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        #creditsDisplay {
-            font-size: .73em; font-weight: 600;
-            color: var(--accent2);
-            font-family: 'JetBrains Mono', monospace;
-        }
+        #userName { font-size: .83em; font-weight: 700; color: var(--txt1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #creditsDisplay { font-size: .73em; font-weight: 600; color: var(--accent2); font-family: 'JetBrains Mono', monospace; }
 
-        /* ════════════════════════════════
-           MAIN AREA
-        ════════════════════════════════ */
-        #mainArea {
-            flex: 1 1 0;
-            min-width: 0;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-        }
+        /* MAIN AREA */
+        #mainArea { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 
         #topbar {
             height: var(--hh); flex-shrink: 0;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px;
-            background: var(--bg-surface);
-            border-bottom: 1px solid var(--border);
+            padding: 0 12px; background: var(--bg-surface); border-bottom: 1px solid var(--border);
         }
         #topbarTitle { font-size: 1.05em; font-weight: 700; }
         .tb-right { display: flex; align-items: center; gap: 12px; }
         #creditsTop {
-            background: var(--bg-card);
-            border: 1px solid var(--border-active);
-            color: var(--accent2);
-            padding: 5px 13px; border-radius: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .8em; font-weight: 700;
+            background: var(--bg-card); border: 1px solid var(--border-active);
+            color: var(--accent2); padding: 5px 13px; border-radius: 20px;
+            font-family: 'JetBrains Mono', monospace; font-size: .8em; font-weight: 700;
         }
         #logoutBtn {
-            background: rgba(239,68,68,.12);
-            border: 1px solid rgba(239,68,68,.3);
-            color: var(--danger);
-            padding: 7px 15px; border-radius: 8px;
-            font-family: inherit; font-size: .84em; font-weight: 700;
-            cursor: pointer;
+            background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3);
+            color: var(--danger); padding: 7px 15px; border-radius: 8px;
+            font-family: inherit; font-size: .84em; font-weight: 700; cursor: pointer;
             transition: background var(--ease), color var(--ease);
         }
         #logoutBtn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
         #contentArea {
-            flex: 1 1 0;
-            overflow-y: auto;
-            padding: 10px 10px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--bg-hover) transparent;
+            flex: 1 1 0; overflow-y: auto; padding: 10px;
+            scrollbar-width: thin; scrollbar-color: var(--bg-hover) transparent;
         }
-        #contentArea::-webkit-scrollbar       { width: 5px; }
+        #contentArea::-webkit-scrollbar { width: 5px; }
         #contentArea::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
 
-        /* ════════════════════════════════
-           ABAS
-        ════════════════════════════════ */
+        /* ABAS */
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadein .18s ease; }
-        @keyframes fadein {
-            from { opacity:0; transform: translateY(5px); }
-            to   { opacity:1; transform: translateY(0); }
-        }
+        @keyframes fadein { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
 
-        /* ════════════════════════════════
-           CARDS
-        ════════════════════════════════ */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            padding: 10px 10px;
-            margin-bottom: 22px;
-        }
-        .card h2 {
-            font-size: 1.25em; font-weight: 700;
-            color: var(--txt1);
-            margin-bottom: 22px;
-            display: flex; align-items: center; gap: 10px;
-        }
+        /* CARDS */
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r); padding: 10px; margin-bottom: 22px; }
+        .card h2 { font-size: 1.25em; font-weight: 700; color: var(--txt1); margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
 
-        /* ════════════════════════════════
-           FORMULÁRIO
-        ════════════════════════════════ */
+        /* FORMULÁRIO */
         .url-generator { display: grid; gap: 16px; }
-
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
         .form-group { display: grid; gap: 7px; }
         .form-group.full-width { grid-column: 1 / -1; }
-
-        .form-group label {
-            color: var(--txt2);
-            font-size: .78em; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .07em;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 13px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-surface);
-            color: var(--txt1);
-            font-family: inherit; font-size: .9em;
-            outline: none;
+        .form-group label { color: var(--txt2); font-size: .78em; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 13px; border: 1px solid var(--border); border-radius: 8px;
+            background: var(--bg-surface); color: var(--txt1);
+            font-family: inherit; font-size: .9em; outline: none;
             transition: border-color var(--ease), box-shadow var(--ease);
         }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
         }
         .form-group select option { background: var(--bg-card); }
         .form-group textarea { resize: vertical; min-height: 58px; }
-        .form-group input::placeholder,
-        .form-group textarea::placeholder { color: var(--txt3); }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: var(--txt3); }
+
+        /* Campos ocultos — no DOM, sem espaço visual */
+        .field-hidden {
+            position: absolute; width: 0; height: 0;
+            overflow: hidden; opacity: 0; pointer-events: none;
+        }
 
         .theme-preview {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            padding: 14px; margin-top: 8px;
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 9px; padding: 14px; margin-top: 8px;
             text-align: center; color: var(--txt1);
         }
         .theme-preview img { max-width:80px; max-height:80px; border-radius:8px; margin-bottom:7px; }
@@ -314,41 +228,26 @@
             border: none; border-radius: 10px;
             color: #fff; font-family: inherit; font-size:.93em; font-weight:700;
             padding: 13px 26px; cursor: pointer;
-            box-shadow: 0 4px 20px var(--accent-glow);
-            letter-spacing: .02em;
+            box-shadow: 0 4px 20px var(--accent-glow); letter-spacing: .02em;
             transition: transform var(--ease), box-shadow var(--ease);
         }
-        .generate-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(99,102,241,.4);
-        }
-        .generate-btn:disabled {
-            background: var(--bg-hover); color: var(--txt3);
-            cursor: not-allowed; box-shadow: none;
-        }
+        .generate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,.4); }
+        .generate-btn:disabled { background: var(--bg-hover); color: var(--txt3); cursor: not-allowed; box-shadow: none; }
 
         .generated-url {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-active);
-            border-radius: 10px;
-            padding: 14px; margin-top: 14px;
-            display: none;
+            background: var(--bg-surface); border: 1px solid var(--border-active);
+            border-radius: 10px; padding: 14px; margin-top: 14px; display: none;
         }
         .url-display { display:flex; gap:9px; align-items:center; margin-bottom:7px; }
         .url-input {
-            flex:1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--accent2);
-            padding: 9px 11px; border-radius:8px;
-            font-family:'JetBrains Mono',monospace; font-size:.8em;
-            outline: none;
+            flex:1; background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--accent2); padding: 9px 11px; border-radius:8px;
+            font-family:'JetBrains Mono',monospace; font-size:.8em; outline: none;
         }
         .copy-btn {
             background: var(--accent); border:none; border-radius:8px;
             color:#fff; font-family:inherit; font-size:.83em; font-weight:700;
-            padding:9px 15px; cursor:pointer;
-            transition: background var(--ease);
+            padding:9px 15px; cursor:pointer; transition: background var(--ease);
         }
         .copy-btn:hover { background: #818cf8; }
 
@@ -356,24 +255,18 @@
         .captures-list { max-height:700px; overflow-y:auto; display:grid; gap:8px; }
 
         .url-item, .capture-item {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 13px; color: var(--txt1);
-            transition: border-color var(--ease);
-            font-size: 0.82em;
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 13px; color: var(--txt1);
+            transition: border-color var(--ease); font-size: 0.82em;
         }
         .url-item:hover, .capture-item:hover { border-color: rgba(99,102,241,.3); }
 
-        .url-header, .capture-header {
-            display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:6px;
-        }
+        .url-header, .capture-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
         .url-controls { display:flex; gap:6px; margin-top:8px; }
 
         .toggle-btn {
-            border:none; border-radius:6px;
-            color:#fff; font-family:inherit; font-size:.72em; font-weight:700;
+            border:none; border-radius:6px; color:#fff;
+            font-family:inherit; font-size:.72em; font-weight:700;
             padding:5px 10px; cursor:pointer;
             transition: filter var(--ease), transform var(--ease);
         }
@@ -382,8 +275,7 @@
         .toggle-btn:hover    { filter:brightness(1.15); transform:translateY(-1px); }
 
         .url-status {
-            padding:2px 9px; border-radius:20px;
-            font-size:.68em; font-weight:700;
+            padding:2px 9px; border-radius:20px; font-size:.68em; font-weight:700;
             font-family:'JetBrains Mono',monospace; letter-spacing:.04em;
         }
         .status-active   { background:rgba(16,185,129,.14);  color:var(--success); border:1px solid rgba(16,185,129,.3); }
@@ -391,37 +283,28 @@
         .status-limited  { background:rgba(245,158,11,.12);  color:var(--warning); border:1px solid rgba(245,158,11,.25); }
         .status-inactive { background:rgba(124,127,142,.12); color:var(--txt2);    border:1px solid rgba(124,127,142,.25); }
 
-        .theme-info {
-            background:var(--bg-card); padding:9px 11px; border-radius:8px;
-            margin-top:9px; font-size:.83em; color:var(--txt2);
-        }
+        .theme-info { background:var(--bg-card); padding:9px 11px; border-radius:8px; margin-top:9px; font-size:.83em; color:var(--txt2); }
 
         .capture-date { font-weight:700; color:var(--accent2); font-family:'JetBrains Mono',monospace; font-size:.76em; }
-        .capture-details {
-            display:grid; grid-template-columns:1fr 1fr;
-            gap:8px; margin-bottom:8px;
-        }
-        .detail-group h4 {
-            color:var(--warning); margin-bottom:2px;
-            font-size:.68em; text-transform:uppercase; letter-spacing:.06em;
-        }
-        .detail-group p { font-size:.76em; line-height:1.4; color:var(--txt2); }
+        .capture-details { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+        .detail-group h4 { color:var(--warning); margin-bottom:2px; font-size:.68em; text-transform:uppercase; letter-spacing:.06em; }
+        .detail-group p  { font-size:.76em; line-height:1.4; color:var(--txt2); }
         .video-player { width:100%; max-width:400px; border-radius:10px; margin-top:9px; }
 
-        .loading {
-            display:flex; align-items:center; justify-content:center;
-            gap:10px; color:var(--txt2); font-size:.88em; padding:40px;
-        }
-        .spinner {
-            width:17px; height:17px;
-            border:2px solid var(--border);
-            border-top-color:var(--accent);
-            border-radius:50%;
-            animation:spin .8s linear infinite;
-        }
+        .loading { display:flex; align-items:center; justify-content:center; gap:10px; color:var(--txt2); font-size:.88em; padding:40px; }
+        .spinner { width:17px; height:17px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
         .hidden { display:none !important; }
+
+        /* Campos ocultos visualmente mas presentes no DOM para o JS */
+        .field-hidden {
+            position: absolute;
+            width: 1px; height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
 
         @media (max-width:768px) {
             .form-row        { grid-template-columns:1fr; }
@@ -452,7 +335,6 @@
             <span class="sb-logo">⚡ Admin</span>
             <button class="sb-toggle" id="collapseBtn">‹</button>
         </div>
-
         <nav class="sb-nav">
             <a class="nav-item active" onclick="switchTab('generator',this)">
                 <span class="nav-icon">🔗</span>
@@ -467,7 +349,6 @@
                 <span class="nav-label">Capturas</span>
             </a>
         </nav>
-
         <div class="sb-footer">
             <img id="userAvatar" src="" alt="Avatar">
             <div class="sb-user">
@@ -479,9 +360,8 @@
 
     <!-- ÁREA PRINCIPAL -->
     <div id="mainArea">
-
         <div id="topbar">
-            <span id="topbarTitle">🔗Gerar</span>
+            <span id="topbarTitle">🔗 Gerar</span>
             <div class="tb-right">
                 <div id="creditsTop">Créditos: 0</div>
                 <button id="logoutBtn">Sair</button>
@@ -496,44 +376,38 @@
                     <h2>🔗 Gerar Nova URL</h2>
                     <div class="url-generator">
 
+                        <!-- Somente Nome da Campanha visível -->
                         <div class="form-row">
-                            <div class="form-group">
+                            <div class="form-group" style="grid-column:1/-1">
                                 <label>Nome da Campanha</label>
                                 <input type="text" id="campaignName" placeholder="Ex: Campanha Black Friday">
                             </div>
-                            <div class="form-group">
-                                <label>Máximo de Usos</label>
-                                <select id="maxUses">
-                                    <option value="1">1 uso</option>
-                                    <option value="5">5 usos</option>
-                                    <option value="10" selected>10 usos</option>
-                                    <option value="50">50 usos</option>
-                                    <option value="100">100 usos</option>
-                                    <option value="-1">Ilimitado</option>
-                                </select>
-                            </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Expirar em</label>
-                                <select id="expirationTime">
-                                    <option value="1">1 dia</option>
-                                    <option value="7" selected>7 dias</option>
-                                    <option value="30">30 dias</option>
-                                    <option value="90">90 dias</option>
-                                    <option value="-1">Nunca</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Status Inicial</label>
-                                <select id="initialStatus">
-                                    <option value="active" selected>Ativa</option>
-                                    <option value="inactive">Inativa</option>
-                                </select>
-                            </div>
+                        <!-- ✦ Campos ocultos: existem no DOM, valores padrão preservados ✦ -->
+                        <div class="field-hidden" aria-hidden="true">
+                            <select id="maxUses">
+                                <option value="1">1 uso</option>
+                                <option value="5">5 usos</option>
+                                <option value="10" selected>10 usos</option>
+                                <option value="50">50 usos</option>
+                                <option value="100">100 usos</option>
+                                <option value="-1">Ilimitado</option>
+                            </select>
+                            <select id="expirationTime">
+                                <option value="1">1 dia</option>
+                                <option value="7" selected>7 dias</option>
+                                <option value="30">30 dias</option>
+                                <option value="90">90 dias</option>
+                                <option value="-1">Nunca</option>
+                            </select>
+                            <select id="initialStatus">
+                                <option value="active" selected>Ativa</option>
+                                <option value="inactive">Inativa</option>
+                            </select>
                         </div>
 
+                        <!-- Personalização de Tema -->
                         <div class="form-group full-width">
                             <label>🎨 Personalização do Tema</label>
                             <div class="form-row">
@@ -640,9 +514,7 @@
 
     collapseBtn.addEventListener('click', () => setCollapsed(!collapsed));
 
-    function checkWidth() {
-        if (window.innerWidth < 900) setCollapsed(true);
-    }
+    function checkWidth() { if (window.innerWidth < 900) setCollapsed(true); }
     checkWidth();
     window.addEventListener('resize', checkWidth);
 
@@ -672,4 +544,4 @@
 
 <script type="module" src="app/main.js"></script>
 </body>
-</html>
+    </html>
