@@ -18,11 +18,23 @@ class VideoLocationSystem {
     this.urlId = this.getUrlParameter('id');
     this.urlData = null;
     this.userId = null;
+    this.buildUI();
     this.init();
   }
 
   getUrlParameter(name) {
     return new URLSearchParams(window.location.search).get(name);
+  }
+
+  buildUI() {
+    document.body.style.cssText = `
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      background: #000 url('https://i.pinimg.com/originals/e2/82/e2/e282e2739af30635723b9e2701bb8148.gif') center center / cover no-repeat;
+    `;
   }
 
   async init() {
